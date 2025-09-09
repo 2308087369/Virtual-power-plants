@@ -1,85 +1,39 @@
-2025-09-01 14:15:06,756 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
-2025-09-01 14:15:09,703 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
-2025-09-01 14:15:12,457 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
-2025-09-01 14:15:15,106 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
-2025-09-01 14:15:17,732 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
-2025-09-01 14:15:20,339 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
-2025-09-01 14:15:48,455 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
-2025-09-01 14:15:51,032 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
-2025-09-01 14:15:53,816 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
-2025-09-01 14:15:56,406 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
-2025-09-01 14:15:58,969 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
-2025-09-01 14:16:01,443 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
-2025-09-01 14:19:44,721 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
-2025-09-01 14:19:47,328 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
-2025-09-01 14:19:50,001 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
-2025-09-01 14:19:52,499 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
-2025-09-01 14:19:55,247 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
-2025-09-01 14:19:57,935 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
-2025-09-01 14:22:16,725 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
-2025-09-01 14:22:19,562 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
-2025-09-01 14:22:22,171 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
-2025-09-01 14:22:24,886 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
-2025-09-01 14:22:27,369 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
-2025-09-01 14:22:30,317 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
-2025-09-01 14:31:24,697 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
-2025-09-01 14:31:27,553 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
-2025-09-01 14:31:30,177 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
-2025-09-01 14:31:32,784 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
-2025-09-01 14:31:35,420 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
-2025-09-01 14:31:37,970 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
-2025-09-01 14:37:24,758 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
-2025-09-01 14:37:24,857 - WARNING - PyomoModel - Loading a SolverResults object with a warning status into model.name="Model";
-  - termination condition: infeasible
-  - message from solver: <undefined>
-2025-09-01 14:37:24,907 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
-2025-09-01 14:37:24,994 - WARNING - PyomoModel - Loading a SolverResults object with a warning status into model.name="Model";
-  - termination condition: infeasible
-  - message from solver: <undefined>
-2025-09-01 14:37:25,044 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
-2025-09-01 14:37:25,118 - WARNING - PyomoModel - Loading a SolverResults object with a warning status into model.name="Model";
-  - termination condition: infeasible
-  - message from solver: <undefined>
-2025-09-01 14:37:25,168 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
-2025-09-01 14:37:25,240 - WARNING - PyomoModel - Loading a SolverResults object with a warning status into model.name="Model";
-  - termination condition: infeasible
-  - message from solver: <undefined>
-2025-09-01 14:37:25,303 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
-2025-09-01 14:37:25,373 - WARNING - PyomoModel - Loading a SolverResults object with a warning status into model.name="Model";
-  - termination condition: infeasible
-  - message from solver: <undefined>
-2025-09-01 14:37:25,423 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
-2025-09-01 14:39:12,428 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
-2025-09-01 14:39:15,272 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
-2025-09-01 14:39:17,973 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
-2025-09-01 14:39:20,652 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
-2025-09-01 14:39:23,205 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
-2025-09-01 14:39:25,934 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
-2025-09-01 14:44:01,729 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
-2025-09-01 14:44:20,709 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
-2025-09-01 14:45:01,279 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
-2025-09-01 14:47:37,029 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
-2025-09-01 14:48:09,897 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
-2025-09-01 14:48:46,508 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
-2025-09-01 14:49:03,316 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
-2025-09-01 14:49:23,543 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
-2025-09-01 14:50:04,877 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
-2025-09-01 14:51:06,698 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
-2025-09-01 14:51:44,304 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
-2025-09-01 14:52:52,517 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
-2025-09-01 14:53:24,980 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
-2025-09-01 14:53:44,450 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
-2025-09-01 14:54:04,462 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
-2025-09-01 14:54:13,498 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
-2025-09-01 14:54:34,701 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
-2025-09-01 14:54:37,123 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
-2025-09-01 14:54:39,890 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
-2025-09-01 14:54:42,462 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
-2025-09-01 14:54:45,115 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
-2025-09-01 14:54:47,902 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
-2025-09-01 15:00:31,366 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
-2025-09-01 15:00:34,154 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
-2025-09-01 15:00:36,762 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
-2025-09-01 15:00:39,314 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
-2025-09-01 15:00:42,122 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
-2025-09-01 15:00:44,790 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
+2025-09-09 09:25:44,379 - INFO - logger - Path for logging: d:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
+2025-09-09 09:27:41,826 - INFO - logger - Path for logging: d:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
+2025-09-09 09:40:52,284 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
+2025-09-09 09:40:55,471 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
+2025-09-09 09:40:56,904 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
+2025-09-09 09:40:58,285 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
+2025-09-09 09:40:59,605 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
+2025-09-09 09:41:01,095 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
+2025-09-09 09:45:32,457 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
+2025-09-09 09:45:34,001 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
+2025-09-09 09:45:35,393 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
+2025-09-09 09:45:36,861 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
+2025-09-09 09:45:38,363 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
+2025-09-09 09:45:39,968 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
+2025-09-09 09:46:15,769 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
+2025-09-09 09:46:41,677 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
+2025-09-09 09:56:29,476 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
+2025-09-09 09:59:18,174 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
+2025-09-09 10:00:37,556 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
+2025-09-09 10:23:08,926 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
+2025-09-09 10:23:11,094 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
+2025-09-09 10:23:13,138 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
+2025-09-09 10:23:15,251 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
+2025-09-09 10:23:17,197 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
+2025-09-09 10:23:19,186 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
+2025-09-09 10:28:57,020 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
+2025-09-09 10:30:51,666 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
+2025-09-09 10:31:44,462 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
+2025-09-09 10:32:34,156 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
+2025-09-09 10:38:44,728 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
+2025-09-09 10:40:55,863 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
+2025-09-09 10:44:34,215 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
+2025-09-09 10:44:36,506 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
+2025-09-09 10:44:38,714 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
+2025-09-09 10:44:41,006 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
+2025-09-09 10:44:43,265 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
+2025-09-09 10:44:45,590 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
+2025-09-09 10:48:07,673 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
+2025-09-09 10:49:08,015 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log

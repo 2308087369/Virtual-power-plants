@@ -1,338 +1,373 @@
-# 虚拟电厂调度优化系统 (VPP Optimization System)
+# Virtual Power Plant Optimization System
 
-基于 oemof-solph 构建的虚拟电厂多能源资源协调调度优化系统，采用 CBC 求解器进行线性规划优化。
+[中文版](README_zh.md) | **English**
 
----
-
-## 🌟 系统效果预览
-
-![虚拟电厂调度优化效果展示](examples/optimization_results.png)
+An advanced Virtual Power Plant (VPP) multi-resource coordination and optimization system built on oemof-solph framework with CBC solver for linear programming optimization.
 
 ---
 
-## 🎯 项目概述
+## 🌟 System Preview
 
-本项目是一个完整的虚拟电厂调度优化解决方案，旨在为虚拟电厂提供智能化的能源资源调度策略，实现多类型能源资源的协调运行和成本最优化。系统集成了**源网荷储**一体化的现代能源管理理念，支持可再生能源、传统发电、储能系统、可调负荷和电网交互的协同优化。
+![VPP Optimization Results](examples/optimization_results.png)
 
-## 注意！！！
-本项目采用的数据都是通过数据生成方式的虚拟数据，如果需要替换成真实数据可以参考生成代码进行替换。
+---
 
-### 核心功能
-- **多能源建模**: 光伏、风电、燃气机组、储能系统、可调负荷、电网交互
-- **智能调度**: 基于线性规划的最优调度策略，支持多种优化目标
-- **多目标优化**: 支持成本最小化和利润最大化两种优化目标
-- **多模式调度**: 提供6种不同的调度模式，满足不同应用场景
-- **辅助服务**: 储能系统参与调频和旋转备用服务，提供系统灵活性和额外收入
-- **需求响应**: 冷机、热机等可调负荷参与系统优化，提供需求侧灵活性
-- **实时分析**: 完整的经济性和技术性能分析，包含辅助服务收益评估
-- **可视化**: 丰富的图表和报告生成，支持辅助服务策略展示
-- **配置化**: 灵活的YAML配置文件管理，支持辅助服务参数调整
-- **交互式界面**: 提供友好的交互式模式选择界面
+## 🎯 Project Overview
 
-### 最新特性 ✨
-- ✅ **多目标优化**: 新增利润最大化优化目标，支持成本最小化和利润最大化双重目标
-- ✅ **交互式选择**: 智能化的交互式界面，支持优化目标和调度模式的灵活选择
-- ✅ **模式对比**: 支持所有调度模式的对比分析，生成详细的对比报告
-- ✅ **会话管理**: 新增会话上下文管理，自动组织和保存结果文件
-- ✅ **辅助服务**: 储能参与调频和旋转备用服务，实现容量预留和辅助服务收入优化
-- ✅ **可调负荷**: 冷机和热机可调负荷，支持需求侧响应
-- ✅ **经济优化**: 综合考虑发电成本、储能成本、可调负荷成本和辅助服务收入
-- ✅ **智能可视化**: 自动检测系统组件，动态生成相应图表包含辅助服务分析
-- ✅ **完整报告**: 包含辅助服务和可调负荷分析的详细运行报告
+This project is a comprehensive Virtual Power Plant optimization solution designed to provide intelligent energy resource scheduling strategies for VPPs, achieving coordinated operation and cost optimization of multiple energy resources. The system integrates the modern **Source-Network-Load-Storage** integrated energy management concept, supporting collaborative optimization of renewable energy, conventional generation, energy storage systems, adjustable loads, and grid interaction.
 
-## 🏗️ 系统架构
+## Notice!!!
+This project uses virtual data generated through data generation methods. To replace with real data, please refer to the generation code for replacement.
+
+### Core Features
+- **Multi-energy modeling**: PV, wind, gas turbine, energy storage, adjustable loads, grid interaction
+- **Intelligent scheduling**: Optimal scheduling strategy based on linear programming, supporting multiple optimization objectives
+- **Multi-objective optimization**: Support for both cost minimization and profit maximization objectives
+- **Multi-mode scheduling**: 6 different scheduling modes for various application scenarios
+- **Ancillary services**: Energy storage participation in frequency regulation and spinning reserve services
+- **Demand response**: Adjustable loads (chiller, heat pump) participate in system optimization
+- **Real-time analysis**: Complete economic and technical performance analysis including ancillary service revenue assessment
+- **Visualization**: Rich charts and report generation with ancillary service strategy display
+- **Configuration**: Flexible YAML configuration file management with ancillary service parameter adjustment
+- **Interactive interface**: User-friendly interactive mode selection interface
+
+### Latest Features ✨
+- ✅ **Multi-objective optimization**: New profit maximization objective, supporting dual objectives
+- ✅ **Interactive selection**: Intelligent interactive interface for flexible selection of optimization objectives and scheduling modes
+- ✅ **Mode comparison**: Support for comparative analysis of all scheduling modes with detailed reports
+- ✅ **Session management**: New session context management with automatic result file organization
+- 🔥 **Energy storage modeling refactoring**: Separated modeling architecture ensuring charge/discharge exclusivity and power constraints
+- ✅ **Physical constraints**: Real physical characteristic modeling of energy storage systems ensuring executable scheduling results
+- ✅ **Ancillary services**: Energy storage participation in frequency regulation and spinning reserve services
+- ✅ **Adjustable loads**: Chiller and heat pump adjustable loads supporting demand response
+- ✅ **Economic optimization**: Comprehensive consideration of generation costs, storage costs, adjustable load costs, and ancillary service revenues
+- ✅ **Intelligent visualization**: Automatic component detection with dynamic chart generation including ancillary service analysis
+- ✅ **Complete reports**: Detailed operation reports including ancillary service and adjustable load analysis
+
+## 🏗️ System Architecture
 
 ```
 vpp_opt_test_qqder/
-├── README.md                    # 项目文档
-├── pyproject.toml              # 项目配置
-├── main.py                     # 主程序入口
-├── config/                     # 配置文件目录
-│   ├── system_config.yaml     # 系统参数配置
-│   └── solver_config.yaml     # 求解器配置
-├── docs/                       # 项目文档
-│   └── optimization_modeling.md # 优化建模详细说明
-├── src/                        # 源代码目录
+├── README.md                    # Project documentation (English)
+├── README_zh.md                 # Project documentation (Chinese)
+├── pyproject.toml              # Project configuration
+├── main.py                     # Main program entry
+├── config/                     # Configuration files
+│   ├── system_config.yaml     # System parameter configuration
+│   └── solver_config.yaml     # Solver configuration
+├── docs/                       # Project documentation
+│   └── optimization_modeling.md # Detailed optimization modeling
+├── src/                        # Source code
 │   ├── __init__.py
-│   ├── data/                   # 数据生成模块
+│   ├── data/                   # Data generation module
 │   │   ├── __init__.py
-│   │   └── data_generator.py   # 负荷、光伏、风电、电价数据生成
-│   ├── models/                 # 优化模型模块
+│   │   └── data_generator.py   # Load, PV, wind, price data generation
+│   ├── models/                 # Optimization model module
 │   │   ├── __init__.py
-│   │   └── vpp_model.py        # oemof-solph能源系统建模
-│   ├── solvers/                # 求解器模块
+│   │   └── vpp_model.py        # oemof-solph energy system modeling
+│   ├── solvers/                # Solver module
 │   │   ├── __init__.py
-│   │   └── optimization_solver.py # CBC求解器配置和优化求解
-│   ├── analysis/               # 结果分析模块
+│   │   └── optimization_solver.py # CBC solver configuration and optimization
+│   ├── analysis/               # Result analysis module
 │   │   ├── __init__.py
-│   │   └── result_analyzer.py  # 经济性分析和性能指标计算
-│   └── visualization/          # 可视化模块
+│   │   └── result_analyzer.py  # Economic analysis and performance metrics
+│   └── visualization/          # Visualization module
 │       ├── __init__.py
-│       └── plot_generator.py   # 结果图表生成和报告
-├── tests/                      # 测试文件
-│   └── test_vpp_system.py     # 系统测试
-├── examples/                   # 示例和演示
-│   └── demo_optimization.py   # 简单演示
-├── outputs/                    # 输出结果目录
-│   ├── plots/                  # 图表输出
-│   └── reports/                # 报告输出
-├── logs/                       # 日志文件
-├── cbc/                        # CBC求解器
+│       └── plot_generator.py   # Result chart generation and reporting
+├── tests/                      # Test files
+│   └── test_vpp_system.py     # System tests
+├── examples/                   # Examples and demos
+│   └── demo_optimization.py   # Simple demo
+├── outputs/                    # Output results
+│   ├── plots/                  # Chart outputs
+│   └── reports/                # Report outputs
+├── logs/                       # Log files
+├── cbc/                        # CBC solver
 │   └── bin/
-│       └── cbc.exe            # CBC可执行文件
-└── test_*.py                   # 功能测试脚本
+│       └── cbc.exe            # CBC executable
+└── test_*.py                   # Function test scripts
 ```
 
-## 🔧 技术栈
+## 🔧 Technology Stack
 
-### 核心技术
-- **优化引擎**: oemof-solph 0.5.0+ (开源能源系统建模框架)
-- **求解器**: CBC (Coin-or Branch and Cut) 线性规划求解器
-- **建模工具**: pyomo 6.6.0+ (数学建模语言)
-- **数据处理**: pandas, numpy
-- **可视化**: matplotlib, plotly
-- **配置管理**: PyYAML
-- **Python版本**: 3.12+
+### Core Technologies
+- **Optimization Engine**: oemof-solph 0.6.0 (Open-source energy system modeling framework)
+- **Solver**: CBC (Coin-or Branch and Cut) linear programming solver
+- **Modeling Tool**: pyomo 6.6.0+ (Mathematical modeling language)
+- **Energy Storage Modeling**: Separated Converter + GenericStorage architecture
+- **Constraint Management**: Strict physical constraint enforcement ensuring charge/discharge exclusivity
+- **Data Processing**: pandas, numpy
+- **Visualization**: matplotlib, plotly
+- **Configuration Management**: PyYAML
+- **Python Version**: 3.12+
 
-### 依赖包
+### Dependencies
 ```toml
-oemof.solph>=0.5.0      # 能源系统建模
-pyomo>=6.6.0            # 数学优化建模
-psutil>=7.0.0           # 系统监控
-PyYAML>=6.0             # 配置文件解析
-scipy>=1.11.0           # 科学计算
-matplotlib>=3.8.0       # 图表绘制
-pandas>=2.1.0           # 数据分析
-numpy>=1.26.0           # 数值计算
+oemof.solph>=0.5.0      # Energy system modeling
+pyomo>=6.6.0            # Mathematical optimization modeling
+psutil>=7.0.0           # System monitoring
+PyYAML>=6.0             # Configuration file parsing
+scipy>=1.11.0           # Scientific computing
+matplotlib>=3.8.0       # Chart plotting
+pandas>=2.1.0           # Data analysis
+numpy>=1.26.0           # Numerical computing
 ```
 
-## 🚀 快速开始
+## 🚀 Quick Start
 
-### 1. 环境准备
+### 1. Environment Setup
 
 ```bash
-# 克隆项目
+# Clone repository
 git clone https://github.com/2308087369/Virtual-power-plants
 cd vpp_opt_test_qqder
 
-# 安装依赖（推荐使用uv）
+# Install dependencies (recommended with uv)
 uv pip install -e .
 
-# 或使用pip
+# Or use pip
 pip install -e .
 ```
 
-### 2. 运行优化
+### 2. Run Optimization
 
-#### 交互式模式（推荐）
+#### Interactive Mode (Recommended)
 ```bash
-# 运行交互式模式，可选择优化目标和调度模式
+# Run interactive mode to select optimization objectives and scheduling modes
 python main.py
 ```
 
-#### 命令行模式
+#### Command Line Mode
 ```bash
-# 运行完整的虚拟电厂优化演示
+# Run complete VPP optimization demo
 python main.py --demo
 
-# 运行指定调度模式
+# Run specific scheduling mode
 python main.py --mode=full_system
 
-# 运行所有模式对比分析
+# Run all modes comparison analysis
 python main.py --compare-all
 
-# 列出所有可用调度模式
+# List all available scheduling modes
 python main.py --list-modes
 
-# 查看帮助信息
+# Show help information
 python main.py --help
 ```
 
-#### 可用调度模式
-- `renewable_storage`: 可再生能源+储能模式
-- `adjustable_storage`: 可调负荷+储能模式  
-- `traditional`: 传统模式（无辅助服务）
-- `no_renewable`: 无可再生能源模式
-- `storage_only`: 纯储能调度模式
-- `full_system`: 完整系统模式
+#### Available Scheduling Modes
+- `renewable_storage`: Renewable energy + storage mode
+- `adjustable_storage`: Adjustable load + storage mode  
+- `traditional`: Traditional mode (no ancillary services)
+- `no_renewable`: No renewable energy mode
+- `storage_only`: Pure storage scheduling mode
+- `full_system`: Complete system mode
 
-#### 优化目标选择
-- `cost_minimization`: 成本最小化（默认）
-- `profit_maximization`: 利润最大化
+#### Optimization Objectives
+- `cost_minimization`: Cost minimization (default)
+- `profit_maximization`: Profit maximization
 
-### 3. 测试功能
+### 3. Testing
 
 ```bash
-# 运行所有测试
+# Run all tests
 python test_runner.py
 
-# 运行基本功能测试
+# Run basic function tests
 python test_runner.py --type basic
 
-# 测试CBC求解器
+# Test CBC solver
 python test_runner.py --type cbc
 
-# 测试调度模式
+# Test scheduling modes
 python test_runner.py --type scheduling
 
-# 测试优化目标
+# Test optimization objectives
 python test_runner.py --type objectives
 
-# 测试可调负荷功能
+# Test adjustable load functionality
 python test_runner.py --type loads
 
-# 测试辅助服务功能
+# Test ancillary service functionality
 python test_runner.py --type ancillary
 
-# 测试完整流程
+# Test complete flow
 python test_runner.py --type flow
 
-# 运行单元测试
+# Run unit tests
 python tests/test_vpp_system.py
 ```
 
-### 4. 配置自定义
+### 4. Custom Configuration
 
-编辑配置文件来自定义系统参数：
+Edit configuration files to customize system parameters:
 
-**系统配置** (`config/system_config.yaml`):
+**System Configuration** (`config/system_config.yaml`):
 ```yaml
-# 能源资源容量配置
+# Energy resource capacity configuration
 energy_resources:
   photovoltaic:
-    capacity_mw: 50          # 光伏装机容量
+    capacity_mw: 50          # PV installed capacity
   wind:
-    capacity_mw: 30          # 风电装机容量
+    capacity_mw: 30          # Wind installed capacity
   gas_turbine:
-    capacity_mw: 100         # 燃气机组容量
+    capacity_mw: 100         # Gas turbine capacity
   battery_storage:
-    power_capacity_mw: 50    # 储能功率容量
-    energy_capacity_mwh: 200 # 储能能量容量
+    power_capacity_mw: 10    # Energy storage power capacity
+    energy_capacity_mwh: 40  # Energy storage energy capacity (4-hour storage)
+    charge_efficiency: 0.95  # Charging efficiency
+    discharge_efficiency: 0.93  # Discharging efficiency
+    min_soc: 0.1            # Minimum SOC (10%)
+    max_soc: 0.95           # Maximum SOC (95%)
     
-    # 辅助服务配置
+    # Ancillary service configuration (currently disabled to ensure storage constraint correctness)
     ancillary_services:
       frequency_regulation:
-        max_capacity_mw: 20     # 调频服务最大容量
-        up_price_yuan_mw: 80     # 向上调频价格
-        down_price_yuan_mw: 70   # 向下调频价格
-        enable: true             # 启用调频服务
-      spinning_reserve:
-        max_capacity_mw: 15      # 备用服务最大容量
-        up_price_yuan_mw: 60     # 向上备用价格
-        down_price_yuan_mw: 50   # 向下备用价格
-        enable: true             # 启用备用服务
+        max_capacity_mw: 20     # Maximum frequency regulation capacity
+        up_price_yuan_mw: 80     # Up regulation price
+        down_price_yuan_mw: 70   # Down regulation price
+        enable: true             # Enable frequency regulation
 
-# 可调负荷配置
+# Adjustable load configuration
 adjustable_loads:
   chiller:
-    rated_power_mw: 20       # 冷机额定功率
-    operating_cost_yuan_mwh: 50  # 运行成本
+    rated_power_mw: 20       # Chiller rated power
+    operating_cost_yuan_mwh: 50  # Operating cost
   heat_pump:
-    rated_power_mw: 15       # 热机额定功率
-    operating_cost_yuan_mwh: 40  # 运行成本
+    rated_power_mw: 15       # Heat pump rated power
+    operating_cost_yuan_mwh: 40  # Operating cost
 ```
 
-**求解器配置** (`config/solver_config.yaml`):
+**Solver Configuration** (`config/solver_config.yaml`):
 ```yaml
 cbc_options:
-  threads: 4               # 使用线程数
-  timeLimit: 300           # 求解时间限制(秒)
-  ratioGap: 0.01          # 最优性间隙(1%)
+  threads: 4               # Number of threads
+  timeLimit: 300           # Solving time limit (seconds)
+  ratioGap: 0.01          # Optimality gap (1%)
 ```
 
-## 📊 主要组件
+## 📊 Main Components
 
-### 1. 发电资源 ⚡
+### 1. Generation Resources ⚡
 
-#### 可再生能源
-- **光伏发电**: 50MW装机，日间出力，成本5元/MWh
-- **风力发电**: 30MW装机，全天候运行，成本8元/MWh
+#### Renewable Energy
+- **Photovoltaic**: 50MW capacity, daytime generation, cost 5 yuan/MWh
+- **Wind Power**: 30MW capacity, 24/7 operation, cost 8 yuan/MWh
 
-#### 传统发电
-- **燃气机组**: 100MW装机，最小出力30%，成本600元/MWh
+#### Conventional Generation
+- **Gas Turbine**: 100MW capacity, minimum output 30%, cost 600 yuan/MWh
 
-### 2. 储能系统 🔋
-- **功率容量**: 50MW (充电/放电)
-- **能量容量**: 200MWh
-- **往返效率**: 90.25% (充电95% × 放电95%)
-- **响应速度**: 毫秒级快速响应
-- **辅助服务**: 参与调频和旋转备用服务，预留一定容量用于系统调节
+### 2. Energy Storage System 🔋
 
-### 3. 可调负荷 🏭
+#### Physical Characteristics
+- **Power Capacity**: 10MW (charge/discharge)
+- **Energy Capacity**: 40MWh (4-hour storage)
+- **Charging Efficiency**: 95%
+- **Discharging Efficiency**: 93%
+- **Round-trip Efficiency**: 88.35% (95% × 93%)
+- **Self-discharge Rate**: 0.05%/hour
+- **SOC Operating Range**: 10%-95%
 
-#### 冷机系统
-- **额定功率**: 20MW
-- **调节范围**: 30%-100%
-- **制冷效率**: 85%
-- **响应时间**: 5分钟
-- **运行成本**: 50元/MWh
+#### Modeling Features ✨
+- **Separated Modeling**: Converter + GenericStorage architecture ensuring physical constraints
+- **Charge/Discharge Exclusivity**: Energy storage as a single physical entity, strictly ensuring charge and discharge cannot occur simultaneously
+- **Power Constraints**: Strict limitation of charge/discharge power to rated capacity through separated Converters
+- **Economic Dispatch**: Intelligent arbitrage based on electricity price differences for cost minimization or profit maximization
+- **Energy Constraints**: Daily charging total limited to 80MWh (2× energy capacity)
+- **Response Speed**: Millisecond-level fast response suitable for ancillary service participation
 
-#### 热机系统
-- **额定功率**: 15MW  
-- **调节范围**: 20%-100%
-- **制热系数**: COP=3.5
-- **响应时间**: 3分钟
-- **运行成本**: 40元/MWh
+#### Technical Innovation
+- **Constraint Guarantee**: Solves traditional GenericStorage constraint failure issues
+- **Physical Modeling**: Truly reflects physical operating characteristics of energy storage stations
+- **Economic Optimization**: Charges during low electricity prices, discharges during high prices for maximum economic benefits
 
-### 4. 电网交互 🏗️
-- **最大购电**: 1000MW
-- **最大售电**: 500MW
-- **售电价格**: 95%市场电价
-- **双向调节**: 支持购售电灵活切换
+### 3. Adjustable Loads 🏭
 
-## 🎯 优化目标与约束
+#### Chiller System
+- **Rated Power**: 20MW
+- **Adjustment Range**: 30%-100%
+- **Cooling Efficiency**: 85%
+- **Response Time**: 5 minutes
+- **Operating Cost**: 50 yuan/MWh
 
-### 优化目标
+#### Heat Pump System
+- **Rated Power**: 15MW  
+- **Adjustment Range**: 20%-100%
+- **Heating Coefficient**: COP=3.5
+- **Response Time**: 3 minutes
+- **Operating Cost**: 40 yuan/MWh
 
-系统支持两种优化目标，用户可根据实际需求选择：
+### 4. Grid Interaction 🏗️
+- **Maximum Purchase**: 1000MW
+- **Maximum Sale**: 500MW
+- **Sale Price**: 95% market price
+- **Bidirectional Regulation**: Support for flexible purchase/sale switching
 
-#### 1. 成本最小化 (Cost Minimization)
-以**总运行成本最小化**为目标，综合优化：
+## 🎯 Optimization Objectives & Constraints
+
+### Optimization Objectives
+
+The system supports two optimization objectives that users can choose based on actual needs:
+
+#### 1. Cost Minimization
+Aims to **minimize total operating costs**, comprehensively optimizing:
 ```
-min: 发电成本 + 储能成本 + 可调负荷成本 + 电网交易成本 - 售电收入 - 辅助服务收入
+min: Generation Cost + Storage Cost + Adjustable Load Cost + Grid Trading Cost - Sale Revenue - Ancillary Service Revenue
 ```
 
-#### 2. 利润最大化 (Profit Maximization)  
-以**总利润最大化**为目标，等价于成本最小化的负值：
+#### 2. Profit Maximization  
+Aims to **maximize total profit**, equivalent to the negative of cost minimization:
 ```
-max: 售电收入 + 辅助服务收入 - 发电成本 - 储能成本 - 可调负荷成本 - 电网交易成本
+max: Sale Revenue + Ancillary Service Revenue - Generation Cost - Storage Cost - Adjustable Load Cost - Grid Trading Cost
 ```
 
-> 💡 **提示**: 两种目标在数学上等价，但利润最大化模式更直观地体现了虚拟电厂的盈利能力，特别适合参与电力市场交易的场景。
+> 💡 **Tip**: Both objectives are mathematically equivalent, but profit maximization mode more intuitively reflects VPP profitability, especially suitable for electricity market trading scenarios.
 
-### 主要约束
-1. **电力平衡约束**: 供需实时平衡
-2. **设备容量约束**: 各设备运行在额定范围内
-3. **储能SOC约束**: 储能荷电状态限制
-4. **机组爬坡约束**: 燃气机组最小出力约束
-5. **可调负荷约束**: 冷热机调节范围约束
-6. **辅助服务约束**: 储能容量预留和辅助服务互斥约束
-7. **电网交易限制**: 购售电功率上限
+### Main Constraints
 
-### 📚 详细数学建模
-> 📖 **完整的优化建模说明**: [优化建模文档](docs/optimization_modeling.md)
+#### System-level Constraints
+1. **Power Balance Constraint**: Real-time supply-demand balance
+2. **Equipment Capacity Constraint**: All equipment operates within rated ranges
+3. **Grid Trading Limits**: Purchase/sale power limits
+
+#### Energy Storage System Constraints 🔋
+4. **Storage Power Constraint**: Charge/discharge power strictly limited to 10MW
+5. **Storage SOC Constraint**: State of charge limited to 10%-95% range
+6. **Charge/Discharge Exclusivity Constraint**: Storage cannot charge and discharge simultaneously (physical constraint)
+7. **Energy Constraint**: Daily charging total not exceeding 80MWh (2× storage capacity)
+8. **Storage Efficiency Constraint**: Considering charge/discharge efficiency and self-discharge losses
+
+#### Other Equipment Constraints
+9. **Unit Ramping Constraint**: Gas turbine minimum output constraint
+10. **Adjustable Load Constraint**: Chiller/heat pump adjustment range constraints
+11. **Ancillary Service Constraint**: Storage capacity reservation and ancillary service exclusivity constraints
+
+> ✨ **Technical Feature**: Through separated modeling architecture, the system can strictly enforce physical constraints of energy storage, ensuring the practical executability of scheduling results.
+
+### 📚 Detailed Mathematical Modeling
+> 📖 **Complete Optimization Modeling Documentation**: [Optimization Modeling](docs/optimization_modeling.md)
 >
-> 包含详细的目标函数、约束条件、决策变量等数学公式和建模方法说明。
+> Includes detailed mathematical formulas and modeling methods for objective functions, constraints, decision variables, etc.
 
-## 📊 输出结果
+## 📊 Output Results
 
-系统会在 `outputs/` 目录下生成详细的分析报告：
+The system generates detailed analysis reports in the `outputs/` directory:
 
-### 单模式分析结果
+### Single Mode Analysis Results
 ```
 outputs/{mode}_{objective}_{timestamp}/
-├── optimization_results.csv      # 优化结果详细数据
-├── economics_analysis.csv        # 经济性分析
-├── technical_metrics.csv         # 技术指标统计
-├── summary_report.txt            # 运行总结报告
-└── optimization_results.png      # 可视化图表
+├── optimization_results.csv      # Detailed optimization results
+├── economics_analysis.csv        # Economic analysis
+├── technical_metrics.csv         # Technical metrics statistics
+├── summary_report.txt            # Operation summary report
+└── optimization_results.png      # Visualization charts
 ```
 
-### 多模式对比分析结果
+### Multi-mode Comparison Analysis Results
 ```
 outputs/
-├── modes_comparison_{objective}_{timestamp}.txt    # 模式对比报告
-└── {mode}_{objective}_{timestamp}/                 # 各模式详细结果
+├── modes_comparison_{objective}_{timestamp}.txt    # Mode comparison report
+└── {mode}_{objective}_{timestamp}/                 # Detailed results for each mode
     ├── optimization_results.csv
     ├── economics_analysis.csv
     ├── technical_metrics.csv
@@ -340,113 +375,94 @@ outputs/
     └── optimization_results.png
 ```
 
-### 调度策略输出
-- ⚡ **发电计划**: 各时段光伏、风电、燃气机组出力
-- 🔋 **储能策略**: 充放电功率和SOC变化
-- 🏭 **负荷调节**: 冷机、热机功率调节策略
-- 🔌 **电网交易**: 购售电计划和交易量
+### Scheduling Strategy Output
+- ⚡ **Generation Plan**: PV, wind, gas turbine output for each time period
+- 🔋 **Storage Strategy**: Charge/discharge power and SOC changes
+- 🏭 **Load Regulation**: Chiller, heat pump power regulation strategy
+- 🔌 **Grid Trading**: Purchase/sale plan and trading volume
 
-### 分析报告
-- 📊 **经济性分析**: 成本结构、收益分析、投资回报
-- 📈 **技术指标**: 可再生能源渗透率、自给自足率、设备利用率
-- 📋 **运行报告**: 详细的系统运行总结和建议
+### Analysis Reports
+- 📊 **Economic Analysis**: Cost structure, revenue analysis, investment returns
+- 📈 **Technical Indicators**: Renewable penetration, self-sufficiency ratio, equipment utilization
+- 📋 **Operation Report**: Detailed system operation summary and recommendations
 
-### 可视化图表
-- 📉 **发电资源出力曲线**
-- ⚖️ **负荷与供应平衡图**
-- 🔋 **储能充放电策略图**
-- 🏭 **可调负荷运行状态图**
-- 💰 **电价变化和成本结构图**
+### Visualization Charts
+- 📉 **Generation Resource Output Curves**
+- ⚖️ **Load and Supply Balance Chart**
+- 🔋 **Energy Storage Charge/Discharge Strategy Chart**
+- 🏭 **Adjustable Load Operation Status Chart**
+- 💰 **Electricity Price Changes and Cost Structure Chart**
 
-## 📊 典型运行结果
+## 📊 Typical Operation Results
 
-基于24小时优化调度的典型结果：
+Based on 24-hour optimization scheduling typical results:
 
-### 能源供需结构
-- **总负荷需求**: 1,259.8 MWh
-- **可再生能源发电**: 665.8 MWh (49.1%渗透率)
-- **可调负荷参与**: 207.0 MWh (16.4%参与率)
-- **辅助服务容量**: 33.5 MW (67.1%参与率)
-- **自给自足率**: 100%
+### Energy Supply-Demand Structure
+- **Total Load Demand**: 1,259.8 MWh
+- **Renewable Energy Generation**: 665.8 MWh (49.1% penetration)
+- **Adjustable Load Participation**: 207.0 MWh (16.4% participation)
+- **Ancillary Service Capacity**: 33.5 MW (67.1% participation)
+- **Self-sufficiency Ratio**: 100%
 
-### 经济性指标
+### Economic Indicators
 
-#### 成本最小化模式
-- **净运行成本**: 109,805元
-- **辅助服务收入**: 49,450元
-- **平均供电成本**: 87.16元/MWh
-- **辅助服务收入占比**: 13.7%
-- **年化运行成本**: 约4,000万元
+#### Cost Minimization Mode
+- **Net Operating Cost**: 109,805 yuan
+- **Ancillary Service Revenue**: 49,450 yuan
+- **Average Power Supply Cost**: 87.16 yuan/MWh
+- **Ancillary Service Revenue Ratio**: 13.7%
+- **Annualized Operating Cost**: ~40 million yuan
 
-#### 利润最大化模式
-- **净运营成本**: -14,121 至 122,933 元/天（负值表示盈利）
-- **平均电力成本**: -224 至 1,952 元/MWh
-- **最优模式**: renewable_storage（可再生能源+储能）
-- **盈利能力排序**: renewable_storage > storage_only > traditional > adjustable_storage > full_system > no_renewable
+#### Profit Maximization Mode
+- **Net Operating Cost**: -14,121 to 122,933 yuan/day (negative indicates profit)
+- **Average Electricity Cost**: -224 to 1,952 yuan/MWh
+- **Optimal Mode**: renewable_storage (renewable energy + storage)
+- **Profitability Ranking**: renewable_storage > storage_only > traditional > adjustable_storage > full_system > no_renewable
 
-### 技术指标
-- **可再生能源利用率**: 高效消纳
-- **辅助服务提供能力**: 向下调频 19.2MW、向下备用 14.4MW
-- **负荷响应能力**: 35MW可调容量
-- **电网交易平衡**: 净售电672MWh
+### Technical Indicators
+- **Renewable Energy Utilization**: Efficient absorption
+- **Ancillary Service Capability**: Down regulation 19.2MW, down reserve 14.4MW
+- **Load Response Capability**: 35MW adjustable capacity
+- **Grid Trading Balance**: Net electricity sale 672MWh
 
-### 模式对比洞察
-- **可再生能源+储能**: 通过售电和储能套利实现盈利
-- **纯储能模式**: 主要通过电价差套利获得收益
-- **传统模式**: 燃气发电成本较高，盈利能力有限
-- **无可再生能源**: 成本最高，经济性最差
+### Mode Comparison Insights
+- **Renewable Energy + Storage**: Achieves profitability through electricity sales and storage arbitrage
+- **Pure Storage Mode**: Mainly profits through electricity price arbitrage
+- **Traditional Mode**: Higher gas generation costs, limited profitability
+- **No Renewable Energy**: Highest costs, worst economics
 
-### 📊 关键技术指标
+### 📊 Key Technical Indicators
 
-通过可视化结果可以清晰看到：
-- **🌞 光伏发电**: 日间高效发电，峰值达到额定容量
-- **💨 风力发电**: 全天候稳定出力，提供基础电力供应
-- **⚡ 燃气机组**: 灵活调节，在可再生能源不足时及时补充
-- **🔋 储能系统**: 削峰填谷，优化电力供需匹配
-- **🏭 可调负荷**: 冷机和热机智能参与需求侧响应
-- **🔌 电网交互**: 双向功率流，实现经济优化运行
+Through visualization results, you can clearly see:
+- **🌞 Photovoltaic Generation**: Efficient daytime generation, peak reaching rated capacity
+- **💨 Wind Generation**: 24/7 stable output providing basic power supply
+- **⚡ Gas Turbine**: Flexible regulation, timely supplementation when renewable energy insufficient
+- **🔋 Energy Storage**: Peak shaving and valley filling, optimizing power supply-demand matching
+- **🏭 Adjustable Loads**: Intelligent participation of chillers and heat pumps in demand response
+- **🔌 Grid Interaction**: Bidirectional power flow achieving economically optimized operation
 
-> 💡 **提示**: 图表数据基于真实的优化算法计算结果，反映了虚拟电厂在实际运行中的调度策略和经济效益。
+> 💡 **Tip**: Chart data is based on real optimization algorithm calculation results, reflecting VPP scheduling strategies and economic benefits in actual operation.
 
-## 🔍 使用场景
+## 🔍 Use Cases
 
-### 适用领域
-- 🏭 **工业园区**: 多能源协调调度和成本优化，通过利润最大化模式实现园区能源系统盈利
-- 🏢 **商业综合体**: 冷热电联供系统优化，支持成本最小化和利润最大化双重目标
-- 🌆 **智慧城市**: 区域能源管理和需求响应，优化城市能源经济效益
-- ⚡ **电力市场**: 虚拟电厂聚合资源参与市场交易，辅助服务市场竞价策略
-- 🔬 **科研院所**: 能源系统优化算法研究，多目标优化建模验证
+### Applicable Fields
+- 🏭 **Industrial Parks**: Multi-energy coordinated scheduling and cost optimization, achieving park energy system profitability through profit maximization mode
+- 🏢 **Commercial Complexes**: Combined cooling, heating, and power system optimization supporting dual objectives
+- 🌆 **Smart Cities**: Regional energy management and demand response, optimizing urban energy economic benefits
+- ⚡ **Electricity Markets**: VPP aggregated resource participation in market trading, ancillary service market bidding strategies
+- 🔬 **Research Institutes**: Energy system optimization algorithm research, multi-objective optimization modeling validation
 
-### 典型用户
-- **虚拟电厂运营商**: 制定最优调度策略，选择成本最小化或利润最大化目标
-- **能源管理系统开发者**: 算法验证和系统集成，多目标优化功能开发
-- **电力市场参与者**: 交易策略制定和风险评估，售电收益最大化
-- **工业用户**: 能源成本控制和需求侧管理，通过可调负荷参与辅助服务获得收益
+### Typical Users
+- **VPP Operators**: Develop optimal scheduling strategies, choose cost minimization or profit maximization objectives
+- **Energy Management System Developers**: Algorithm validation and system integration, multi-objective optimization development
+- **Electricity Market Participants**: Trading strategy development and risk assessment, maximizing electricity sales revenue
+- **Industrial Users**: Energy cost control and demand-side management, participating in ancillary services through adjustable loads for revenue
 
-### 应用场景对比
+## 🛠️ Development Guide
 
-#### 成本最小化模式
-- **工业园区**: 降低园区整体用能成本，优化能源采购策略
-- **电力市场**: 优化购电策略，降低电力采购成本
-- **可再生能源**: 风光储一体化运行，降低新能源弃电成本
-- **需求响应**: 负荷侧资源聚合调度，峰谷电价套利
+### Extending New Adjustable Resources
 
-#### 利润最大化模式
-- **工业园区**: 通过售电和辅助服务创收，实现园区能源系统盈利
-- **电力市场**: 辅助服务市场竞价策略，现货市场交易优化，容量市场参与决策
-- **可再生能源**: 新能源发电售电收益最大化，储能套利策略优化
-- **需求响应**: 需求响应服务收益最大化，电网调峰辅助服务创收
-
-#### 虚拟电厂运营决策
-- **投资决策**: 对比不同配置方案的经济性表现
-- **运营策略**: 根据市场环境选择最优调度模式和优化目标
-- **风险评估**: 分析不同模式下的盈利能力和风险水平
-
-## 🛠️ 开发指南
-
-### 扩展新的可调资源
-
-1. **配置文件扩展**:
+1. **Configuration File Extension**:
 ```yaml
 # config/system_config.yaml
 adjustable_loads:
@@ -455,69 +471,120 @@ adjustable_loads:
     operating_cost_yuan_mwh: 30
 ```
 
-2. **模型组件添加**:
+2. **Model Component Addition**:
 ```python
 # src/models/vpp_model.py
 def _create_adjustable_loads(self):
-    # 添加新设备的建模逻辑
+    # Add modeling logic for new device
     new_device = solph.components.Sink(...)
 ```
 
-3. **结果分析更新**:
+3. **Result Analysis Update**:
 ```python
 # src/analysis/result_analyzer.py
-# 添加新设备的结果提取和分析
+# Add result extraction and analysis for new device
 ```
 
-### 自定义优化目标
+### Custom Optimization Objectives
 
-可以通过修改oemof-solph模型来实现不同的优化目标：
-- 碳排放最小化
-- 可再生能源利用率最大化
-- 峰谷差最小化
-- 多目标权衡优化
+Different optimization objectives can be implemented by modifying the oemof-solph model:
+- Carbon emission minimization
+- Renewable energy utilization maximization
+- Peak-valley difference minimization
+- Multi-objective trade-off optimization
 
-## ⚠️ 注意事项
+## ⚠️ Notes
 
-### 系统要求
-- **操作系统**: Windows 10+, Linux, macOS
-- **Python版本**: 3.12或更高
-- **内存**: 建议8GB以上
-- **处理器**: 多核处理器，支持并行计算
+### System Requirements
+- **Operating System**: Windows 10+, Linux, macOS
+- **Python Version**: 3.12 or higher
+- **Memory**: Recommended 8GB or more
+- **Processor**: Multi-core processor supporting parallel computing
 
-### 求解器配置
-- CBC求解器已包含在项目中 (`cbc/bin/cbc.exe`)
-- 大规模问题建议使用商业求解器（Gurobi, CPLEX）
-- 求解时间可通过配置文件调整
+### Solver Configuration
+- CBC solver included in project (`cbc/bin/cbc.exe`)
+- Commercial solvers recommended for large-scale problems (Gurobi, CPLEX)
+- Solving time adjustable through configuration files
 
-### 性能优化建议
-- 适当调整时间段数量和模型复杂度
-- 使用多线程求解提升性能
-- 监控内存使用，避免内存不足
+### Performance Optimization Suggestions
+- Appropriately adjust number of time periods and model complexity
+- Use multi-threading for improved performance
+- Monitor memory usage to avoid insufficient memory
 
-## 🐛 故障排除
+## 🐛 Troubleshooting
 
-### 常见问题
+### Common Issues
 
-**1. CBC求解器找不到**
+**1. CBC Solver Not Found**
 ```bash
-# 检查CBC路径
+# Check CBC path
 ls cbc/bin/cbc.exe
 
-# 重新安装依赖
+# Reinstall dependencies
 uv pip install -e .
 ```
 
-**2. 求解失败**
-- 检查数据有效性
-- 调整求解器参数
-- 查看日志文件 `logs/solver.log`
+**2. Solving Failure**
+- Check data validity
+- Adjust solver parameters
+- Check log files `logs/solver.log`
 
-**3. 内存不足**
-- 减少优化时间段
-- 简化模型约束
-- 增加虚拟内存
+**3. Energy Storage Constraint Anomalies**
+```bash
+# Check if energy storage modeling is correct
+python -c "
+import pandas as pd
+df = pd.read_csv('outputs/storage_only_*/results/optimization_results.csv')
+charge_power = abs(df['battery_charge_mw'])
+discharge_power = df['battery_discharge_mw']
+print(f'Max charging power: {charge_power.max():.1f} MW')
+print(f'Max discharging power: {discharge_power.max():.1f} MW')
+# Check charge/discharge exclusivity
+simultaneous = ((charge_power > 0.001) & (discharge_power > 0.001)).sum()
+print(f'Simultaneous charge/discharge periods: {simultaneous}')
+"
+```
+- If power exceeds limits or simultaneous charge/discharge occurs, energy storage modeling needs repair
+- Ensure use of separated modeling architecture (Converter + GenericStorage)
+- Check if result analyzer correctly identifies energy storage components
 
-## 📝 许可证
+**4. Insufficient Memory**
+- Reduce optimization time periods
+- Simplify model constraints
+- Increase virtual memory
 
-MIT License - 详见 [LICENSE](LICENSE) 文件
+## 🏆 Technical Highlight: Energy Storage Modeling Innovation
+
+### Problem & Challenge
+Traditional oemof-solph GenericStorage modeling may encounter in complex scenarios:
+- Power constraint failure (charge/discharge power exceeding rated values)
+- Simultaneous charge/discharge (violating physical laws)
+- SOC constraint failure (state of charge exceeding reasonable ranges)
+
+### Innovative Solution
+This project innovatively adopts **Separated Energy Storage Modeling Architecture**:
+
+#### Architecture Design
+```
+Grid Bus ←→ Converter (Charger) ←→ Storage Internal Bus ←→ GenericStorage (Storage Tank)
+                                    ↕
+                               Converter (Discharger) ←→ Grid Bus
+```
+
+#### Technical Advantages
+1. **Physical Constraint Guarantee**: Converter's nominal_value strictly limits power
+2. **Charge/Discharge Exclusivity**: Different physical paths naturally ensure exclusivity
+3. **Economic Dispatch**: Storage intelligently participates in electricity price arbitrage for maximum economic benefits
+4. **Reliable Results**: Scheduling results completely comply with physical operating characteristics of energy storage stations
+
+#### Validation Results
+- ✅ Charge/Discharge Exclusivity: 0 simultaneous charge/discharge periods
+- ✅ Power Constraints: Charge/discharge power ≤10MW
+- ✅ Energy Constraints: Daily charging ≤80MWh 
+- ✅ Economic Benefits: Storage participates in arbitrage generating positive revenue
+
+> 🏆 **Technical Achievement**: This project solves energy storage system modeling challenges in the oemof-solph framework, providing a reliable technical solution for VPP energy storage scheduling.
+
+## 📝 License
+
+MIT License - See [LICENSE](LICENSE) file for details

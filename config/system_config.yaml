@@ -28,30 +28,36 @@ energy_resources:
   # 储能系统
   battery_storage:
     power_capacity_mw: 10  # 功率容量 (MW)
-    energy_capacity_mwh: 20  # 能量容量 (MWh)
+    energy_capacity_mwh: 40  # 能量容量 (MWh) - 增加到4小时，降低C-rate
     charge_efficiency: 0.95  # 充电效率
-    discharge_efficiency: 0.95  # 放电效率
-    self_discharge_rate: 0.001  # 自放电率 (%/h)
+    discharge_efficiency: 0.93  # 放电效率 - 略低于充电效率，更符合实际
+    self_discharge_rate: 0.0005  # 自放电率 (%/h) - 降低到0.05%/小时
     initial_soc: 0.5  # 初始SOC
-    min_soc: 0.2  # 最小SOC约束
-    max_soc: 0.9  # 最大SOC约束
-    charge_cost_yuan_mwh: 10  # 充电成本 (元/MWh)
-    discharge_cost_yuan_mwh: 10  # 放电成本 (元/MWh)
+    min_soc: 0.1  # 最小SOC约束 - 更保守，保护电池
+    max_soc: 0.95  # 最大SOC约束 - 提高到95%，增加利用率
+    charge_cost_yuan_mwh: 8  # 充电成本 (元/MWh) - 降低充电成本
+    discharge_cost_yuan_mwh: 12  # 放电成本 (元/MWh) - 放电成本高于充电
+    cycle_degradation_cost_yuan_mwh: 15  # 循环损耗成本 (元/MWh) - 新增
+    deep_discharge_penalty_yuan_mwh: 50  # 深度放电惩罚 (元/MWh) - 新增
     
     # 辅助服务配置
     ancillary_services:
       # 调频服务
       frequency_regulation:
         max_capacity_mw: 3  # 最大调频容量 (MW)
+        max_capacity_ratio: 0.3  # 最大30%容量用于调频
         up_price_yuan_mw: 80  # 向上调频价格 (元/MW)
         down_price_yuan_mw: 70  # 向下调频价格 (元/MW)
+        response_time_sec: 4  # 4秒响应时间
         enable: true  # 是否启用调频服务
         
       # 旋转备用服务  
       spinning_reserve:
         max_capacity_mw: 2  # 最大备用容量 (MW)
+        max_capacity_ratio: 0.2  # 最大20%容量用于备用
         up_price_yuan_mw: 60  # 向上备用价格 (元/MW)
         down_price_yuan_mw: 50  # 向下备用价格 (元/MW)
+        response_time_sec: 10  # 10秒响应时间
         enable: true  # 是否启用备用服务
         
       # 辅助服务约束

@@ -125,7 +125,12 @@ class ResultAnalyzer:
             if not gas_sequences.empty:
                 results_df['gas_generation_mw'] = gas_sequences.iloc[:, 0].values
         
-        # 提取储能系统
+        # 提取储能系统（支持统一储能和分离式储能）
+        battery_charge_mw = None
+        battery_discharge_mw = None
+        battery_soc = None
+        
+        # 方式1：统一的battery_storage组件
         if 'battery_storage' in component_results:
             battery_sequences = component_results['battery_storage']['sequences']
             if not battery_sequences.empty:
@@ -134,13 +139,42 @@ class ResultAnalyzer:
                     battery_charge = battery_sequences.iloc[:, 0].values  # 充电
                     battery_discharge = battery_sequences.iloc[:, 1].values  # 放电
                     
-                    results_df['battery_charge_mw'] = -battery_charge  # 充电为负值
-                    results_df['battery_discharge_mw'] = battery_discharge  # 放电为正值
-                    results_df['battery_net_mw'] = battery_discharge - battery_charge
+                    battery_charge_mw = -battery_charge  # 充电为负值
+                    battery_discharge_mw = battery_discharge  # 放电为正值
                 
                 # 储能状态（如果有的话）
                 if battery_sequences.shape[1] >= 3:
-                    results_df['battery_soc'] = battery_sequences.iloc[:, 2].values
+                    battery_soc = battery_sequences.iloc[:, 2].values
+        
+        # 方式2：分离式储能组件（battery_charger + battery_discharger + battery_tank）
+        if battery_charge_mw is None and battery_discharge_mw is None:
+            # 提取充电器数据
+            if 'battery_charger' in component_results:
+                charger_sequences = component_results['battery_charger']['sequences']
+                if not charger_sequences.empty and charger_sequences.shape[1] >= 1:
+                    battery_charge_mw = -charger_sequences.iloc[:, 0].values  # 充电为负值
+            
+            # 提取放电器数据  
+            if 'battery_discharger' in component_results:
+                discharger_sequences = component_results['battery_discharger']['sequences']
+                if not discharger_sequences.empty and discharger_sequences.shape[1] >= 1:
+                    battery_discharge_mw = discharger_sequences.iloc[:, 0].values  # 放电为正值
+            
+            # 提取储能状态
+            if 'battery_tank' in component_results:
+                tank_sequences = component_results['battery_tank']['sequences']
+                if not tank_sequences.empty and tank_sequences.shape[1] >= 1:
+                    battery_soc = tank_sequences.iloc[:, 0].values  # SOC状态
+        
+        # 统一设置储能数据列
+        if battery_charge_mw is not None:
+            results_df['battery_charge_mw'] = battery_charge_mw
+        if battery_discharge_mw is not None:
+            results_df['battery_discharge_mw'] = battery_discharge_mw
+        if battery_charge_mw is not None and battery_discharge_mw is not None:
+            results_df['battery_net_mw'] = battery_discharge_mw + battery_charge_mw  # 注意：charge已经是负值
+        if battery_soc is not None:
+            results_df['battery_soc'] = battery_soc
         
         # 提取电网交互
         if 'grid_source' in component_results:
@@ -259,17 +293,35 @@ class ResultAnalyzer:
         gas_energy = self.results_df.get('gas_generation_mw', pd.Series(0, index=self.time_index)).sum()
         economics['gas_cost_yuan'] = gas_energy * gas_cost_rate
         
-        # 储能成本
+        # 储能成本（包含循环损耗）
         battery_config = energy_config.get('battery_storage', {})
-        charge_cost_rate = battery_config.get('charge_cost_yuan_mwh', 10)
-        discharge_cost_rate = battery_config.get('discharge_cost_yuan_mwh', 15)
+        charge_cost_rate = battery_config.get('charge_cost_yuan_mwh', 8)
+        discharge_cost_rate = battery_config.get('discharge_cost_yuan_mwh', 12)
+        cycle_degradation_cost_rate = battery_config.get('cycle_degradation_cost_yuan_mwh', 15)
         
         battery_charge_energy = abs(self.results_df.get('battery_charge_mw', pd.Series(0, index=self.time_index))).sum()
         battery_discharge_energy = self.results_df.get('battery_discharge_mw', pd.Series(0, index=self.time_index)).sum()
         
+        # 基本运行成本
         economics['battery_charge_cost_yuan'] = battery_charge_energy * charge_cost_rate
         economics['battery_discharge_cost_yuan'] = battery_discharge_energy * discharge_cost_rate
-        economics['battery_total_cost_yuan'] = economics['battery_charge_cost_yuan'] + economics['battery_discharge_cost_yuan']
+        
+        # 循环损耗成本（基于充电量计算）
+        economics['battery_cycle_degradation_cost_yuan'] = battery_charge_energy * cycle_degradation_cost_rate
+        
+        # 检查深度放电惩罚
+        battery_soc = self.results_df.get('battery_soc', pd.Series(0.5, index=self.time_index))
+        deep_discharge_penalty_rate = battery_config.get('deep_discharge_penalty_yuan_mwh', 50)
+        deep_discharge_hours = (battery_soc < 0.2).sum()  # SOC低于20%的小时数
+        economics['battery_deep_discharge_penalty_yuan'] = deep_discharge_hours * deep_discharge_penalty_rate
+        
+        # 总储能成本
+        economics['battery_total_cost_yuan'] = (
+            economics['battery_charge_cost_yuan'] + 
+            economics['battery_discharge_cost_yuan'] + 
+            economics['battery_cycle_degradation_cost_yuan'] +
+            economics['battery_deep_discharge_penalty_yuan']
+        )
         
         # 可调负荷成本
         adjustable_loads_config = self.config.get('adjustable_loads', {})
