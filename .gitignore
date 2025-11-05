@@ -10,6 +10,6 @@ outputs/*
 outputs/**/*
 outputs/**/**/*
 outputs/**/**/**/*
-
+CLAUDE.md
 # Virtual environments
 .venv
