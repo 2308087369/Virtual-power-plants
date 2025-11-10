@@ -31,22 +31,22 @@
 示例图（以下为关键图像引用）：
 - 综合看板：
   - `microgrid_results/comprehensive_dashboard.png`
-  - `![综合看板](microgrid_results/comprehensive_dashboard.png)`
+  - ![综合看板](microgrid_results/comprehensive_dashboard.png)
 - 成本对比：
   - `microgrid_results/overall_cost_comparison.png`
-  - `![成本对比](microgrid_results/overall_cost_comparison.png)`
+  - ![成本对比](microgrid_results/overall_cost_comparison.png)
 - 场景5（综合优化方案）调度：
   - `microgrid_results/power_scheduling_05_综合优化方案.png`
-  - `![综合优化方案-功率调度](microgrid_results/power_scheduling_05_综合优化方案.png)`
+  - ![综合优化方案-功率调度](microgrid_results/power_scheduling_05_综合优化方案.png)
 - 场景4（含储能）储能分析：
   - `microgrid_results/storage_analysis_04_含储能系统优化.png`
-  - `![含储能-储能分析](microgrid_results/storage_analysis_04_含储能系统优化.png)`
+  - ![含储能-储能分析](microgrid_results/storage_analysis_04_含储能系统优化.png)
 - 场景3（允许弃风弃光）可再生利用：
   - `microgrid_results/renewable_utilization_03_允许弃风弃光优化.png`
-  - `![允许弃风弃光-可再生利用](microgrid_results/renewable_utilization_03_允许弃风弃光优化.png)`
+  - ![允许弃风弃光-可再生利用](microgrid_results/renewable_utilization_03_允许弃风弃光优化.png)
 - 场景1（仅电网供电）调度：
   - `microgrid_results/power_scheduling_01_基准场景-仅电网供电.png`
-  - `![基准场景-功率调度](microgrid_results/power_scheduling_01_基准场景-仅电网供电.png)`
+  - ![基准场景-功率调度](microgrid_results/power_scheduling_01_基准场景-仅电网供电.png)
 
 ---
 
