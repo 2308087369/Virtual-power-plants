@@ -154,3 +154,9 @@ vpp_opt_test_qqder/
 ## 📄 许可证
 
 MIT License - 详见 [LICENSE](LICENSE) 文件
+### 示例
+- 微电网优化示例（含完整可视化与报告）：
+  - 脚本：`examples/optimization_microgrid_complete.py`
+  - 说明（中文）：`examples/readme.md`
+  - 说明（英文）：`examples/readme_en.md`
+  - 结果目录：`examples/microgrid_results/`

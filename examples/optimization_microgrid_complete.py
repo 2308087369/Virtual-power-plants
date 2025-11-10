@@ -31,60 +31,81 @@ from typing import Dict, List, Tuple, Optional
 import warnings
 warnings.filterwarnings('ignore')
 
+# -----------------------------------------------------------------------------
+# Scenario name mapping to English and filename-safe slug helper
+# -----------------------------------------------------------------------------
+SCENARIO_NAME_MAP = {
+    '基准场景-仅电网供电': 'Baseline - Grid Only',
+    '可再生能源全额利用': 'Full Renewable Utilization',
+    '允许弃风弃光优化': 'Curtailment Allowed Optimization',
+    '含储能系统优化': 'Optimization with Storage',
+    '综合优化方案': 'Integrated Optimization Plan'
+}
+
+def scenario_en(name: str) -> str:
+    """Map Chinese scenario names to English for display."""
+    return SCENARIO_NAME_MAP.get(name, name)
+
+def scenario_slug(name: str) -> str:
+    """Create an ASCII filename-friendly slug from scenario name."""
+    en = scenario_en(name)
+    slug = en.replace(' ', '_').replace('-', '_')
+    return ''.join(ch for ch in slug if ch.isalnum() or ch == '_')
+
 # =============================================================================
 # 字体配置 - 使用文泉驿正黑
 # =============================================================================
 
 # 记录已选定的中文字体族名，方便在样式设置后重新应用
-CHINESE_FONT_NAME: Optional[str] = None
+# CHINESE_FONT_NAME: Optional[str] = None
 
-def setup_chinese_fonts():
-    """设置中文字体为文泉驿正黑"""
-    # 检查字体文件路径
-    font_paths = [
-        '/usr/share/fonts/truetype/wqy/wqy-zenhei.ttc',
-        '/usr/share/fonts/truetype/wqy/wqy-microhei.ttc'
-    ]
+# def setup_chinese_fonts():
+#     """设置中文字体为文泉驿正黑"""
+#     # 检查字体文件路径
+#     font_paths = [
+#         '/usr/share/fonts/truetype/wqy/wqy-zenhei.ttc',
+#         '/usr/share/fonts/truetype/wqy/wqy-microhei.ttc'
+#     ]
 
-    available_font = None
-    for font_path in font_paths:
-        if os.path.exists(font_path):
-            available_font = font_path
-            break
+#     available_font = None
+#     for font_path in font_paths:
+#         if os.path.exists(font_path):
+#             available_font = font_path
+#             break
 
-    if available_font:
-        # 添加字体
-        fm.fontManager.addfont(available_font)
-        # 通过文件解析出 Matplotlib 识别的字体族名称
-        prop = fm.FontProperties(fname=available_font)
-        font_name = prop.get_name()
-        # 记录全局字体族名
-        global CHINESE_FONT_NAME
-        CHINESE_FONT_NAME = font_name
-        # 设置默认字体为识别到的族名，并提供中文字体回退列表
-        plt.rcParams['font.family'] = [font_name]
-        plt.rcParams['font.sans-serif'] = [
-            font_name,
-            'WenQuanYi Zen Hei',
-            'WenQuanYi Micro Hei',
-            'SimHei',
-            'Noto Sans CJK SC',
-            'DejaVu Sans'
-        ]
-        plt.rcParams['text.usetex'] = False
-        print(f"已设置字体: {available_font} -> {font_name}")
-    else:
-        print("警告: 未找到文泉驿字体，使用系统默认中文字体")
-        plt.rcParams['font.sans-serif'] = ['SimHei', 'Noto Sans CJK SC', 'DejaVu Sans']
-        plt.rcParams['font.family'] = ['sans-serif']
-        plt.rcParams['text.usetex'] = False
+#     if available_font:
+#         # 添加字体
+#         fm.fontManager.addfont(available_font)
+#         # 通过文件解析出 Matplotlib 识别的字体族名称
+#         prop = fm.FontProperties(fname=available_font)
+#         font_name = prop.get_name()
+#         # 记录全局字体族名
+#         global CHINESE_FONT_NAME
+#         CHINESE_FONT_NAME = font_name
+#         # 设置默认字体为识别到的族名，并提供中文字体回退列表
+#         plt.rcParams['font.family'] = [font_name]
+#         plt.rcParams['font.sans-serif'] = [
+#             font_name,
+#             'WenQuanYi Zen Hei',
+#             'WenQuanYi Micro Hei',
+#             'SimHei',
+#             'Noto Sans CJK SC',
+#             'DejaVu Sans'
+#         ]
+#         plt.rcParams['text.usetex'] = False
+#         print(f"已设置字体: {available_font} -> {font_name}")
+#     else:
+#         print("警告: 未找到文泉驿字体，使用系统默认中文字体")
+#         plt.rcParams['font.sans-serif'] = ['SimHei', 'Noto Sans CJK SC', 'DejaVu Sans']
+#         plt.rcParams['font.family'] = ['sans-serif']
+#         plt.rcParams['text.usetex'] = False
 
-    plt.rcParams['axes.unicode_minus'] = False
-    sns.set_style("whitegrid")
-    sns.set_context("paper", font_scale=1.2)
+#     plt.rcParams['axes.unicode_minus'] = False
+#     sns.set_style("whitegrid")
+#     sns.set_context("paper", font_scale=1.2)
 
-# 初始化字体
-setup_chinese_fonts()
+# # 初始化字体
+# setup_chinese_fonts()
 
 # =============================================================================
 # 基础模型类
@@ -349,41 +370,41 @@ class MicroGridVisualizer:
         # 设置图表样式和颜色
         plt.style.use('seaborn-v0_8')
         # 注意：样式可能重置字体，需在样式之后重新应用中文字体
-        if CHINESE_FONT_NAME:
-            plt.rcParams['font.family'] = [CHINESE_FONT_NAME]
-            plt.rcParams['font.sans-serif'] = [
-                CHINESE_FONT_NAME,
-                'WenQuanYi Zen Hei',
-                'WenQuanYi Micro Hei',
-                'SimHei',
-                'Noto Sans CJK SC',
-                'DejaVu Sans'
-            ]
+        # if CHINESE_FONT_NAME:
+        #     plt.rcParams['font.family'] = [CHINESE_FONT_NAME]
+        #     plt.rcParams['font.sans-serif'] = [
+        #         CHINESE_FONT_NAME,
+        #         'WenQuanYi Zen Hei',
+        #         'WenQuanYi Micro Hei',
+        #         'SimHei',
+        #         'Noto Sans CJK SC',
+        #         'DejaVu Sans'
+        #     ]
         plt.rcParams['axes.unicode_minus'] = False
         self.colors = ['#e74c3c', '#3498db', '#2ecc71', '#f39c12', '#9b59b6', '#1abc9c', '#34495e']
 
     def plot_power_scheduling(self, mg: MicroGrid, save_name: str = "power_scheduling"):
-        """绘制功率调度图"""
+        """Plot power dispatch scheduling (English labels)."""
         fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(14, 10), sharex=True)
 
         # 时间轴
         hours = np.arange(mg.time_points) * mg.time_step
 
-        # 子图1: 电源出力
-        ax1.set_title(f'{mg.scenario_name} - 电源出力调度', fontsize=16, fontweight='bold', pad=20)
+        # Subplot 1: Power dispatch
+        ax1.set_title(f"{scenario_en(mg.scenario_name)} - Power Dispatch Scheduling", fontsize=16, fontweight='bold', pad=20)
 
         for i, (name, data) in enumerate(mg.results['resources'].items()):
             if name != 'load':
                 ax1.plot(hours, data['output'], label=name, linewidth=2.5, color=self.colors[i], marker='o', markersize=3)
 
-        ax1.plot(hours, mg.load, label='负荷', linewidth=3, color='black', linestyle='--', marker='s', markersize=3)
-        ax1.set_ylabel('功率 (kW)', fontsize=12)
+        ax1.plot(hours, mg.load, label='Load', linewidth=3, color='black', linestyle='--', marker='s', markersize=3)
+        ax1.set_ylabel('Power (kW)', fontsize=12)
         ax1.legend(loc='upper right', fontsize=11)
         ax1.grid(True, alpha=0.3)
         ax1.set_xlim(0, 24)
 
-        # 子图2: 累积出力
-        ax2.set_title('电源出力累积图', fontsize=16, fontweight='bold', pad=20)
+        # Subplot 2: Cumulative generation
+        ax2.set_title('Cumulative Generation', fontsize=16, fontweight='bold', pad=20)
 
         cumulative = np.zeros(mg.time_points)
         for i, (name, data) in enumerate(mg.results['resources'].items()):
@@ -392,9 +413,9 @@ class MicroGridVisualizer:
                                label=name, alpha=0.7, color=self.colors[i])
                 cumulative += data['output']
 
-        ax2.plot(hours, mg.load, label='负荷', linewidth=3, color='black', linestyle='--', marker='s', markersize=3)
-        ax2.set_xlabel('时间 (小时)', fontsize=12)
-        ax2.set_ylabel('功率 (kW)', fontsize=12)
+        ax2.plot(hours, mg.load, label='Load', linewidth=3, color='black', linestyle='--', marker='s', markersize=3)
+        ax2.set_xlabel('Time (hours)', fontsize=12)
+        ax2.set_ylabel('Power (kW)', fontsize=12)
         ax2.legend(loc='upper right', fontsize=11)
         ax2.grid(True, alpha=0.3)
         ax2.set_xlim(0, 24)
@@ -404,7 +425,7 @@ class MicroGridVisualizer:
         plt.close()
 
     def plot_renewable_utilization(self, mg: MicroGrid, save_name: str = "renewable_utilization"):
-        """绘制可再生能源利用情况"""
+        """Plot renewable utilization (English labels)."""
         renewable_resources = {k: v for k, v in mg.results['resources'].items()
                               if k in ['wind', 'pv']}
 
@@ -415,24 +436,24 @@ class MicroGridVisualizer:
         hours = np.arange(mg.time_points) * mg.time_step
 
         for i, (name, data) in enumerate(renewable_resources.items()):
-            # 预测vs实际出力
+            # Forecast vs actual output
             ax = axes[0, i]
-            ax.plot(hours, data['forecast'], label='预测出力', linewidth=3, color='red', marker='o', markersize=3)
-            ax.plot(hours, data['output'], label='实际出力', linewidth=3, color='blue', marker='s', markersize=3)
+            ax.plot(hours, data['forecast'], label='Forecast Output', linewidth=3, color='red', marker='o', markersize=3)
+            ax.plot(hours, data['output'], label='Actual Output', linewidth=3, color='blue', marker='s', markersize=3)
             ax.fill_between(hours, data['output'], data['forecast'],
-                          alpha=0.3, color='gray', label='弃电')
-            ax.set_title(f'{name.upper()} - 预测vs实际出力', fontsize=14, fontweight='bold', pad=15)
-            ax.set_ylabel('功率 (kW)', fontsize=11)
+                          alpha=0.3, color='gray', label='Curtailed')
+            ax.set_title(f"{name.upper()} - Forecast vs Actual Output", fontsize=14, fontweight='bold', pad=15)
+            ax.set_ylabel('Power (kW)', fontsize=11)
             ax.legend(fontsize=10)
             ax.grid(True, alpha=0.3)
             ax.set_xlim(0, 24)
 
-            # 利用率饼图
+            # Utilization pie chart
             ax = axes[1, i]
             utilization = data['utilization']
             curtailment = data['curtailment_rate']
             wedges, texts, autotexts = ax.pie([utilization, curtailment],
-                  labels=['利用', '弃电'],
+                  labels=['Utilized', 'Curtailed'],
                   autopct='%1.1f%%',
                   colors=['#2ecc71', '#e74c3c'],
                   startangle=90,
@@ -442,14 +463,14 @@ class MicroGridVisualizer:
                 autotext.set_color('white')
                 autotext.set_fontweight('bold')
 
-            ax.set_title(f'{name.upper()} - 利用率分析', fontsize=14, fontweight='bold', pad=15)
+            ax.set_title(f"{name.upper()} - Utilization Analysis", fontsize=14, fontweight='bold', pad=15)
 
         plt.tight_layout()
         plt.savefig(f"{self.save_dir}/{save_name}.png", dpi=300, bbox_inches='tight')
         plt.close()
 
     def plot_storage_analysis(self, mg: MicroGrid, save_name: str = "storage_analysis"):
-        """绘制储能分析图"""
+        """Plot storage analysis (English labels)."""
         if 'battery' not in mg.results['resources']:
             return
 
@@ -457,21 +478,21 @@ class MicroGridVisualizer:
         fig, axes = plt.subplots(2, 2, figsize=(16, 12))
         hours = np.arange(mg.time_points) * mg.time_step
 
-        # 充放电功率
+        # Charge/Discharge power
         ax = axes[0, 0]
         ax.plot(hours, battery_data['output'], linewidth=3, color='blue', marker='o', markersize=3)
         ax.axhline(y=0, color='black', linestyle='--', alpha=0.7, linewidth=2)
         ax.fill_between(hours, 0, battery_data['output'],
-                       where=battery_data['output']>0, alpha=0.4, color='#e74c3c', label='放电')
+                       where=battery_data['output']>0, alpha=0.4, color='#e74c3c', label='Discharge')
         ax.fill_between(hours, 0, battery_data['output'],
-                       where=battery_data['output']<0, alpha=0.4, color='#2ecc71', label='充电')
-        ax.set_title('蓄电池充放电功率', fontsize=14, fontweight='bold', pad=15)
-        ax.set_ylabel('功率 (kW)', fontsize=11)
+                       where=battery_data['output']<0, alpha=0.4, color='#2ecc71', label='Charge')
+        ax.set_title('Battery Charge/Discharge Power', fontsize=14, fontweight='bold', pad=15)
+        ax.set_ylabel('Power (kW)', fontsize=11)
         ax.legend(fontsize=10)
         ax.grid(True, alpha=0.3)
         ax.set_xlim(0, 24)
 
-        # SOC计算和绘制
+        # SOC calculation and plot
         ax = axes[0, 1]
         soc = np.zeros(mg.time_points)
         initial_soc = 0.4  # 从Storage类获取初始SOC
@@ -481,35 +502,35 @@ class MicroGridVisualizer:
             soc[i] = soc[i-1] + (battery_data['output'][i-1] * mg.time_step) / 300  # 300kWh容量
 
         ax.plot(hours, soc * 100, linewidth=3, color='purple', marker='o', markersize=3)
-        ax.axhline(y=30, color='red', linestyle='--', alpha=0.7, label='SOC下限')
-        ax.axhline(y=95, color='orange', linestyle='--', alpha=0.7, label='SOC上限')
-        ax.set_title('蓄电池SOC变化', fontsize=14, fontweight='bold', pad=15)
+        ax.axhline(y=30, color='red', linestyle='--', alpha=0.7, label='SOC Lower Limit')
+        ax.axhline(y=95, color='orange', linestyle='--', alpha=0.7, label='SOC Upper Limit')
+        ax.set_title('Battery SOC Change', fontsize=14, fontweight='bold', pad=15)
         ax.set_ylabel('SOC (%)', fontsize=11)
         ax.legend(fontsize=10)
         ax.grid(True, alpha=0.3)
         ax.set_xlim(0, 24)
 
-        # 充放电统计
+        # Charge/Discharge statistics
         ax = axes[1, 0]
         charge_energy = -np.sum(np.minimum(battery_data['output'], 0)) * mg.time_step
         discharge_energy = np.sum(np.maximum(battery_data['output'], 0)) * mg.time_step
 
-        bars = ax.bar(['充电量', '放电量'], [charge_energy, discharge_energy],
+        bars = ax.bar(['Charge Energy', 'Discharge Energy'], [charge_energy, discharge_energy],
                color=['#2ecc71', '#e74c3c'], alpha=0.8, width=0.6)
-        ax.set_title('日充放电量统计', fontsize=14, fontweight='bold', pad=15)
-        ax.set_ylabel('电量 (kWh)', fontsize=11)
+        ax.set_title('Daily Charge/Discharge Energy', fontsize=14, fontweight='bold', pad=15)
+        ax.set_ylabel('Energy (kWh)', fontsize=11)
 
         # 添加数值标签
         for i, v in enumerate([charge_energy, discharge_energy]):
             ax.text(i, v + max(charge_energy, discharge_energy) * 0.02,
                    f'{v:.1f}', ha='center', va='bottom', fontsize=11, fontweight='bold')
 
-        # 效率分析
+        # Efficiency analysis
         ax = axes[1, 1]
         efficiency = (discharge_energy / charge_energy * 100) if charge_energy > 0 else 0
-        bars = ax.bar(['充放电效率'], [efficiency], color='#f39c12', alpha=0.8, width=0.6)
-        ax.set_title('储能系统效率', fontsize=14, fontweight='bold', pad=15)
-        ax.set_ylabel('效率 (%)', fontsize=11)
+        bars = ax.bar(['Round-trip Efficiency'], [efficiency], color='#f39c12', alpha=0.8, width=0.6)
+        ax.set_title('Storage System Efficiency', fontsize=14, fontweight='bold', pad=15)
+        ax.set_ylabel('Efficiency (%)', fontsize=11)
         ax.set_ylim(0, 100)
 
         # 添加数值标签
@@ -520,20 +541,20 @@ class MicroGridVisualizer:
         plt.close()
 
     def plot_cost_breakdown(self, results_list: List[Dict], save_name: str = "cost_breakdown"):
-        """绘制成本分解图"""
+        """Plot cost breakdown (English labels)."""
         fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(16, 8))
 
         scenarios = [r['scenario_name'] for r in results_list]
         total_costs = [r['operation_cost'] for r in results_list]
         avg_costs = [r['average_cost'] for r in results_list]
 
-        # 总成本对比
+        # Total cost comparison
         bars1 = ax1.bar(range(len(scenarios)), total_costs,
                        color=self.colors[:len(scenarios)], alpha=0.8, width=0.7)
-        ax1.set_title('各场景总运行成本对比', fontsize=16, fontweight='bold', pad=20)
-        ax1.set_ylabel('总成本 (元)', fontsize=12)
+        ax1.set_title('Total Operating Cost by Scenario', fontsize=16, fontweight='bold', pad=20)
+        ax1.set_ylabel('Total Cost (CNY)', fontsize=12)
         ax1.set_xticks(range(len(scenarios)))
-        ax1.set_xticklabels([name.replace('场景', '') for name in scenarios], rotation=45, ha='right')
+        ax1.set_xticklabels([scenario_en(name) for name in scenarios], rotation=45, ha='right')
 
         # 添加数值标签
         for bar, cost in zip(bars1, total_costs):
@@ -541,13 +562,13 @@ class MicroGridVisualizer:
             ax1.text(bar.get_x() + bar.get_width()/2., height + height*0.01,
                     f'{cost:.0f}', ha='center', va='bottom', fontsize=11, fontweight='bold')
 
-        # 平均成本对比
+        # Average price comparison
         bars2 = ax2.bar(range(len(scenarios)), avg_costs,
                        color=self.colors[:len(scenarios)], alpha=0.8, width=0.7)
-        ax2.set_title('各场景平均购电单价对比', fontsize=16, fontweight='bold', pad=20)
-        ax2.set_ylabel('平均单价 (元/kWh)', fontsize=12)
+        ax2.set_title('Average Purchase Price by Scenario', fontsize=16, fontweight='bold', pad=20)
+        ax2.set_ylabel('Average Price (CNY/kWh)', fontsize=12)
         ax2.set_xticks(range(len(scenarios)))
-        ax2.set_xticklabels([name.replace('场景', '') for name in scenarios], rotation=45, ha='right')
+        ax2.set_xticklabels([scenario_en(name) for name in scenarios], rotation=45, ha='right')
 
         # 添加数值标签
         for bar, cost in zip(bars2, avg_costs):
@@ -560,7 +581,7 @@ class MicroGridVisualizer:
         plt.close()
 
     def plot_comprehensive_dashboard(self, data: Dict, save_name: str = "comprehensive_dashboard"):
-        """创建综合分析仪表板"""
+        """Create comprehensive analysis dashboard (English labels)."""
         # 提取关键数据
         results = data['results']
         comparison = data['comparison']
@@ -568,17 +589,17 @@ class MicroGridVisualizer:
         # 创建大图表
         fig = plt.figure(figsize=(22, 18))
 
-        # 1. 成本对比总览
+        # 1. Total cost overview
         ax1 = plt.subplot(3, 3, 1)
         scenario_names = [r['scenario_name'] for r in results]
         total_costs = [r['operation_cost'] for r in results]
 
         bars = ax1.bar(range(len(scenario_names)), total_costs,
                        color=self.colors[:len(scenario_names)], alpha=0.8, width=0.7)
-        ax1.set_title('总运行成本对比', fontsize=14, fontweight='bold', pad=15)
-        ax1.set_ylabel('成本 (元)', fontsize=11)
+        ax1.set_title('Total Operating Cost Comparison', fontsize=14, fontweight='bold', pad=15)
+        ax1.set_ylabel('Cost (CNY)', fontsize=11)
         ax1.set_xticks(range(len(scenario_names)))
-        ax1.set_xticklabels([name.replace('场景', '') for name in scenario_names], rotation=45, ha='right')
+        ax1.set_xticklabels([scenario_en(name) for name in scenario_names], rotation=45, ha='right')
 
         # 添加数值标签
         for bar, cost in zip(bars, total_costs):
@@ -586,16 +607,16 @@ class MicroGridVisualizer:
             ax1.text(bar.get_x() + bar.get_width()/2., height + 10,
                     f'{cost:.0f}', ha='center', va='bottom', fontsize=10, fontweight='bold')
 
-        # 2. 平均单价对比
+        # 2. Average price comparison
         ax2 = plt.subplot(3, 3, 2)
         avg_costs = [r['average_cost'] for r in results]
 
         bars = ax2.bar(range(len(scenario_names)), avg_costs,
                        color=self.colors[:len(scenario_names)], alpha=0.8, width=0.7)
-        ax2.set_title('平均购电单价对比', fontsize=14, fontweight='bold', pad=15)
-        ax2.set_ylabel('单价 (元/kWh)', fontsize=11)
+        ax2.set_title('Average Purchase Price Comparison', fontsize=14, fontweight='bold', pad=15)
+        ax2.set_ylabel('Price (CNY/kWh)', fontsize=11)
         ax2.set_xticks(range(len(scenario_names)))
-        ax2.set_xticklabels([name.replace('场景', '') for name in scenario_names], rotation=45, ha='right')
+        ax2.set_xticklabels([scenario_en(name) for name in scenario_names], rotation=45, ha='right')
 
         # 添加数值标签
         for bar, cost in zip(bars, avg_costs):
@@ -603,7 +624,7 @@ class MicroGridVisualizer:
             ax2.text(bar.get_x() + bar.get_width()/2., height + 0.005,
                     f'{cost:.3f}', ha='center', va='bottom', fontsize=10, fontweight='bold')
 
-        # 3. 成本节约分析
+        # 3. Cost savings analysis
         ax3 = plt.subplot(3, 3, 3)
         baseline_cost = total_costs[0]
         savings = [baseline_cost - cost for cost in total_costs[1:]]
@@ -611,10 +632,10 @@ class MicroGridVisualizer:
 
         colors = ['#e74c3c' if s < 0 else '#2ecc71' for s in savings]
         bars = ax3.bar(range(len(saving_scenarios)), savings, color=colors, alpha=0.8, width=0.7)
-        ax3.set_title('相比基准场景成本节约', fontsize=14, fontweight='bold', pad=15)
-        ax3.set_ylabel('节约金额 (元)', fontsize=11)
+        ax3.set_title('Cost Savings vs Baseline', fontsize=14, fontweight='bold', pad=15)
+        ax3.set_ylabel('Savings (CNY)', fontsize=11)
         ax3.set_xticks(range(len(saving_scenarios)))
-        ax3.set_xticklabels([name.replace('场景', '') for name in saving_scenarios], rotation=45, ha='right')
+        ax3.set_xticklabels([scenario_en(name) for name in saving_scenarios], rotation=45, ha='right')
         ax3.axhline(y=0, color='black', linestyle='--', alpha=0.5)
 
         # 添加数值标签
@@ -623,7 +644,7 @@ class MicroGridVisualizer:
             ax3.text(bar.get_x() + bar.get_width()/2., height + (5 if height > 0 else -15),
                     f'{saving:.0f}', ha='center', va='bottom' if height > 0 else 'top', fontsize=10, fontweight='bold')
 
-        # 4. 可再生能源利用率雷达图
+        # 4. Renewable utilization radar chart
         ax4 = plt.subplot(3, 3, 4, projection='polar')
 
         # 提取风电和光伏利用率
@@ -645,18 +666,18 @@ class MicroGridVisualizer:
         wind_utilizations_plot = wind_utilizations + [wind_utilizations[0]]
         pv_utilizations_plot = pv_utilizations + [pv_utilizations[0]]
 
-        ax4.plot(angles, wind_utilizations_plot, 'o-', linewidth=3, label='风电利用率', color='#3498db')
+        ax4.plot(angles, wind_utilizations_plot, 'o-', linewidth=3, label='Wind Utilization', color='#3498db')
         ax4.fill(angles, wind_utilizations_plot, alpha=0.25, color='#3498db')
-        ax4.plot(angles, pv_utilizations_plot, 'o-', linewidth=3, label='光伏利用率', color='#e74c3c')
+        ax4.plot(angles, pv_utilizations_plot, 'o-', linewidth=3, label='PV Utilization', color='#e74c3c')
         ax4.fill(angles, pv_utilizations_plot, alpha=0.25, color='#e74c3c')
 
         ax4.set_xticks(angles[:-1])
-        ax4.set_xticklabels([name.replace('场景', '') for name in renewable_scenarios])
+        ax4.set_xticklabels([scenario_en(name) for name in renewable_scenarios])
         ax4.set_ylim(0, 1)
-        ax4.set_title('可再生能源利用率对比', fontsize=14, fontweight='bold', pad=20)
+        ax4.set_title('Renewable Utilization Comparison', fontsize=14, fontweight='bold', pad=20)
         ax4.legend(loc='upper right', bbox_to_anchor=(1.2, 1.0))
 
-        # 5. 弃电分析
+        # 5. Curtailment analysis
         ax5 = plt.subplot(3, 3, 5)
 
         wind_curtailments = []
@@ -673,13 +694,13 @@ class MicroGridVisualizer:
         x = np.arange(len(curtailment_scenarios))
         width = 0.35
 
-        ax5.bar(x - width/2, wind_curtailments, width, label='弃风率', color='#3498db', alpha=0.8)
-        ax5.bar(x + width/2, pv_curtailments, width, label='弃光率', color='#e74c3c', alpha=0.8)
+        ax5.bar(x - width/2, wind_curtailments, width, label='Wind Curtailment', color='#3498db', alpha=0.8)
+        ax5.bar(x + width/2, pv_curtailments, width, label='PV Curtailment', color='#e74c3c', alpha=0.8)
 
-        ax5.set_title('弃风弃光率对比', fontsize=14, fontweight='bold', pad=15)
-        ax5.set_ylabel('弃电率 (%)', fontsize=11)
+        ax5.set_title('Curtailment Rate Comparison', fontsize=14, fontweight='bold', pad=15)
+        ax5.set_ylabel('Curtailment (%)', fontsize=11)
         ax5.set_xticks(x)
-        ax5.set_xticklabels([name.replace('场景', '') for name in curtailment_scenarios], rotation=45, ha='right')
+        ax5.set_xticklabels([scenario_en(name) for name in curtailment_scenarios], rotation=45, ha='right')
         ax5.legend()
 
         # 添加数值标签
@@ -687,7 +708,7 @@ class MicroGridVisualizer:
             ax5.text(i - width/2, wind + 1, f'{wind:.1f}%', ha='center', va='bottom', fontsize=9, fontweight='bold')
             ax5.text(i + width/2, pv + 1, f'{pv:.1f}%', ha='center', va='bottom', fontsize=9, fontweight='bold')
 
-        # 6. 储能系统放电量对比
+        # 6. Storage system discharge energy comparison
         ax6 = plt.subplot(3, 3, 6)
 
         storage_discharges = []
@@ -702,10 +723,10 @@ class MicroGridVisualizer:
         if storage_discharges:
             bars = ax6.bar(range(len(storage_scenarios)), storage_discharges,
                           color=['#f39c12'], alpha=0.8, width=0.7)
-            ax6.set_title('储能系统日放电量', fontsize=14, fontweight='bold', pad=15)
-            ax6.set_ylabel('放电量 (kWh)', fontsize=11)
+            ax6.set_title('Daily Discharge Energy of Storage', fontsize=14, fontweight='bold', pad=15)
+            ax6.set_ylabel('Discharge Energy (kWh)', fontsize=11)
             ax6.set_xticks(range(len(storage_scenarios)))
-            ax6.set_xticklabels([name.replace('场景', '') for name in storage_scenarios], rotation=45, ha='right')
+            ax6.set_xticklabels([scenario_en(name) for name in storage_scenarios], rotation=45, ha='right')
 
             # 添加数值标签
             for bar, discharge in zip(bars, storage_discharges):
@@ -713,18 +734,18 @@ class MicroGridVisualizer:
                 ax6.text(bar.get_x() + bar.get_width()/2., height + height*0.01,
                         f'{discharge:.0f}', ha='center', va='bottom', fontsize=10, fontweight='bold')
         else:
-            ax6.text(0.5, 0.5, '无储能系统', ha='center', va='center', transform=ax6.transAxes, fontsize=12)
-            ax6.set_title('储能系统日放电量', fontsize=14, fontweight='bold', pad=15)
+            ax6.text(0.5, 0.5, 'No Storage System', ha='center', va='center', transform=ax6.transAxes, fontsize=12)
+            ax6.set_title('Daily Discharge Energy of Storage', fontsize=14, fontweight='bold', pad=15)
 
-        # 7. 成本构成分析
+        # 7. Cost breakdown analysis
         ax7 = plt.subplot(3, 3, 7)
 
-        # 简化的成本构成
-        scenarios_subset = scenario_names[-2:]  # 取最后两个含储能的场景
+        # Simplified cost breakdown
+        scenarios_subset = scenario_names[-2:]  # last two scenarios (with storage)
         cost_data = {
-            '电网交互': [800, 750],  # 示例数据
-            '可再生能源': [550, 450],
-            '储能系统': [100, 90]
+            'Grid Interaction': [800, 750],  # sample data
+            'Renewables': [550, 450],
+            'Storage System': [100, 90]
         }
 
         x = np.arange(len(scenarios_subset))
@@ -733,13 +754,13 @@ class MicroGridVisualizer:
         for i, (component, costs) in enumerate(cost_data.items()):
             ax7.bar(x + i*width, costs, width, label=component, alpha=0.8)
 
-        ax7.set_title('成本构成分解', fontsize=14, fontweight='bold', pad=15)
-        ax7.set_ylabel('成本 (元)', fontsize=11)
+        ax7.set_title('Cost Breakdown', fontsize=14, fontweight='bold', pad=15)
+        ax7.set_ylabel('Cost (CNY)', fontsize=11)
         ax7.set_xticks(x + width)
-        ax7.set_xticklabels([name.replace('场景', '') for name in scenarios_subset])
+        ax7.set_xticklabels([scenario_en(name) for name in scenarios_subset])
         ax7.legend()
 
-        # 8. 经济性排名
+        # 8. Economic ranking
         ax8 = plt.subplot(3, 3, 8)
 
         # 按总成本排序
@@ -752,9 +773,9 @@ class MicroGridVisualizer:
         bars = ax8.barh(y_pos, sorted_costs, color=self.colors[:len(sorted_scenarios)])
 
         ax8.set_yticks(y_pos)
-        ax8.set_yticklabels([name.replace('场景', '') for name in sorted_scenarios])
-        ax8.set_xlabel('总成本 (元)', fontsize=11)
-        ax8.set_title('经济性排名', fontsize=14, fontweight='bold', pad=15)
+        ax8.set_yticklabels([scenario_en(name) for name in sorted_scenarios])
+        ax8.set_xlabel('Total Cost (CNY)', fontsize=11)
+        ax8.set_title('Economic Ranking', fontsize=14, fontweight='bold', pad=15)
 
         # 添加数值标签
         for i, (bar, cost) in enumerate(zip(bars, sorted_costs)):
@@ -762,11 +783,11 @@ class MicroGridVisualizer:
             ax8.text(width + 10, bar.get_y() + bar.get_height()/2.,
                     f'{cost:.0f}', ha='left', va='center', fontsize=10, fontweight='bold')
 
-        # 9. 综合评分对比
+        # 9. Comprehensive score comparison
         ax9 = plt.subplot(3, 3, 9, projection='polar')
 
-        # 定义评价指标
-        metrics = ['经济性', '环保性', '可靠性', '灵活性']
+        # Define evaluation metrics
+        metrics = ['Economy', 'Environment', 'Reliability', 'Flexibility']
 
         # 为每个场景计算综合评分
         scores = {}
@@ -807,17 +828,17 @@ class MicroGridVisualizer:
 
         for i, (scenario, score) in enumerate(scores.items()):
             score_plot = score + [score[0]]
-            ax9.plot(angles, score_plot, 'o-', linewidth=2, label=scenario.replace('场景', ''), color=self.colors[i])
+            ax9.plot(angles, score_plot, 'o-', linewidth=2, label=scenario_en(scenario), color=self.colors[i])
             ax9.fill(angles, score_plot, alpha=0.1, color=self.colors[i])
 
         ax9.set_xticks(angles[:-1])
         ax9.set_xticklabels(metrics)
         ax9.set_ylim(0, 1)
-        ax9.set_title('综合评分对比', fontsize=14, fontweight='bold', pad=20)
+        ax9.set_title('Comprehensive Score Comparison', fontsize=14, fontweight='bold', pad=20)
         ax9.legend(loc='upper right', bbox_to_anchor=(1.3, 1.0), fontsize=8)
 
-        # 设置整体标题
-        fig.suptitle('微电网优化调度综合分析仪表板', fontsize=20, fontweight='bold', y=0.98)
+        # Set overall title
+        fig.suptitle('Microgrid Optimization Comprehensive Analysis Dashboard', fontsize=20, fontweight='bold', y=0.98)
 
         # 调整布局
         plt.tight_layout()
@@ -1221,16 +1242,16 @@ def main():
 
         # 可视化
         print(f"   生成可视化图表...")
-        visualizer.plot_power_scheduling(mg, f"power_scheduling_{i:02d}_{scenario['name']}")
+        visualizer.plot_power_scheduling(mg, f"power_scheduling_{i:02d}_{scenario_slug(scenario['name'])}")
 
         if any(isinstance(r, Renewable) for r in scenario['resources']):
-            visualizer.plot_renewable_utilization(mg, f"renewable_utilization_{i:02d}_{scenario['name']}")
+            visualizer.plot_renewable_utilization(mg, f"renewable_utilization_{i:02d}_{scenario_slug(scenario['name'])}")
 
         if any(isinstance(r, Storage) for r in scenario['resources']):
-            visualizer.plot_storage_analysis(mg, f"storage_analysis_{i:02d}_{scenario['name']}")
+            visualizer.plot_storage_analysis(mg, f"storage_analysis_{i:02d}_{scenario_slug(scenario['name'])}")
 
         # 保存详细日志
-        log_file = f"{results_dir}/optimization_log_{i:02d}_{scenario['name']}.txt"
+        log_file = f"{results_dir}/optimization_log_{i:02d}_{scenario_slug(scenario['name'])}.txt"
         with open(log_file, 'w', encoding='utf-8') as f:
             f.write(f"场景: {scenario['name']}\n")
             f.write(f"描述: {scenario['description']}\n")

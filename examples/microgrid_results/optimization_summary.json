@@ -3,45 +3,45 @@
     {
       "name": "基准场景-仅电网供电",
       "resources": [
-        "<__main__.Grid object at 0x000001F97F428290>"
+        "<__main__.Grid object at 0x00000173FFB7D6A0>"
       ],
       "description": "无可再生能源，无储能，电网交换无约束"
     },
     {
       "name": "可再生能源全额利用",
       "resources": [
-        "<__main__.Grid object at 0x000001F97F2B4140>",
-        "<__main__.Renewable object at 0x000001F97F2B4080>",
-        "<__main__.Renewable object at 0x000001F97F4282F0>"
+        "<__main__.Grid object at 0x00000173FFAB8EF0>",
+        "<__main__.Renewable object at 0x00000173FFAA22D0>",
+        "<__main__.Renewable object at 0x00000173FF954860>"
       ],
       "description": "可再生能源全额利用，无弃风弃光"
     },
     {
       "name": "允许弃风弃光优化",
       "resources": [
-        "<__main__.Grid object at 0x000001F97F4282C0>",
-        "<__main__.Renewable object at 0x000001F97F428260>",
-        "<__main__.Renewable object at 0x000001F97F428230>"
+        "<__main__.Grid object at 0x00000173FFBA64E0>",
+        "<__main__.Renewable object at 0x00000173FFBA7D10>",
+        "<__main__.Renewable object at 0x00000173FFBA7CE0>"
       ],
       "description": "允许弃风弃光，以经济性最优为目标"
     },
     {
       "name": "含储能系统优化",
       "resources": [
-        "<__main__.Grid object at 0x000001F97F4281D0>",
-        "<__main__.Renewable object at 0x000001F97F428200>",
-        "<__main__.Renewable object at 0x000001F97F428320>",
-        "<__main__.Storage object at 0x000001F97F428350>"
+        "<__main__.Grid object at 0x00000173FFBA7BC0>",
+        "<__main__.Renewable object at 0x00000173FFBA7CB0>",
+        "<__main__.Renewable object at 0x00000173FFBA7C80>",
+        "<__main__.Storage object at 0x00000173FFBA7C50>"
       ],
       "description": "含储能系统，电网交换功率≤150kW，可再生能源全额利用"
     },
     {
       "name": "综合优化方案",
       "resources": [
-        "<__main__.Grid object at 0x000001F97F29E8D0>",
-        "<__main__.Renewable object at 0x000001F97F428380>",
-        "<__main__.Renewable object at 0x000001F97F4283B0>",
-        "<__main__.Storage object at 0x000001F97F4283E0>"
+        "<__main__.Grid object at 0x00000173FFAB8F80>",
+        "<__main__.Renewable object at 0x00000173FFAB8EC0>",
+        "<__main__.Renewable object at 0x00000173FFBA7D40>",
+        "<__main__.Storage object at 0x00000173FFBA7D70>"
       ],
       "description": "含储能系统，允许弃风弃光，电网交换功率≤150kW"
     }
@@ -282,5 +282,5 @@
       }
     }
   },
-  "timestamp": "2025-11-10T09:25:16.053814"
+  "timestamp": "2025-11-10T09:49:50.070483"
 }

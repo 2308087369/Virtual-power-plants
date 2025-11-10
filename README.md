@@ -153,3 +153,9 @@ Based on 24-hour optimization:
 ## 📄 License
 
 MIT License - See [LICENSE](LICENSE) file for details
+### Examples
+- Microgrid optimization demo with full visualization:
+  - Script: `examples/optimization_microgrid_complete.py`
+  - README (CN): `examples/readme.md`
+  - README (EN): `examples/readme_en.md`
+  - Results: `examples/microgrid_results/` (figures and reports)
