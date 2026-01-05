@@ -1,1 +1,515 @@
-2025-11-04 18:03:39,927 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
+2026-01-05 14:51:43,718 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
+2026-01-05 14:51:43,719 - INFO - vpp_model - 正在创建虚拟电厂能源系统模型...
+2026-01-05 14:51:43,731 - INFO - vpp_model - 储能配置 - 功率容量: 10 MW, 能量容量: 40 MWh
+2026-01-05 14:51:43,734 - INFO - vpp_model - 已启用调频辅助服务: 最大容量 3 MW
+2026-01-05 14:51:43,734 - INFO - vpp_model - 已启用旋转备用辅助服务: 最大容量 2 MW
+2026-01-05 14:51:43,737 - INFO - vpp_model - 能源系统创建完成，包含 14 个组件
+2026-01-05 14:52:16,551 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
+2026-01-05 14:52:16,565 - INFO - main - ----------------------------------------
+2026-01-05 14:52:16,566 - INFO - vpp_model - 能源系统验证通过
+2026-01-05 14:52:16,566 - INFO - main -   - 组件总数: 17
+2026-01-05 14:52:16,568 - INFO - main -   - 时间段数: 24
+2026-01-05 14:52:16,568 - INFO - main -   - 优化目标: cost_minimization
+2026-01-05 14:52:16,568 - INFO - main - ----------------------------------------
+2026-01-05 14:52:16,571 - INFO - optimization_solver - 使用指定的CBC路径: D:\py_work\vpp_opt_test_qqder\cbc/bin/cbc.exe
+2026-01-05 14:52:16,688 - INFO - optimization_solver - ==================================================
+2026-01-05 14:52:16,688 - INFO - optimization_solver - 开始优化求解...
+2026-01-05 14:52:16,688 - INFO - optimization_solver - ==================================================
+2026-01-05 14:52:16,688 - INFO - optimization_solver - 正在创建优化模型...
+2026-01-05 14:52:16,698 - INFO - optimization_solver - 优化模型创建成功
+2026-01-05 14:52:16,698 - INFO - optimization_solver - 执行预求解回调函数（添加自定义约束等）...
+2026-01-05 14:52:16,698 - INFO - main - 检测到辅助服务组件，正在添加耦合约束...
+2026-01-05 14:52:16,698 - WARNING - vpp_model - 未找到储能组件，跳过辅助服务约束添加
+2026-01-05 14:52:16,698 - INFO - optimization_solver - 使用求解器: cbc
+2026-01-05 14:52:16,698 - INFO - optimization_solver - 求解器参数: {'tee': False, 'options': {'threads': 16, 'ratioGap': 0.01, 'timeLimit': 300}}
+2026-01-05 14:52:16,698 - INFO - optimization_solver - 使用Pyomo调用CBC: D:\py_work\vpp_opt_test_qqder\cbc/bin/cbc.exe
+2026-01-05 14:52:16,890 - INFO - optimization_solver - ----------------------------------------
+2026-01-05 14:52:16,890 - INFO - optimization_solver - 求解统计信息:
+2026-01-05 14:52:16,890 - INFO - optimization_solver - ----------------------------------------
+2026-01-05 14:52:16,890 - INFO - optimization_solver - 求解时间: 0.20 秒
+2026-01-05 14:52:16,890 - INFO - optimization_solver - 内存使用: 2.1 MB
+2026-01-05 14:52:16,890 - INFO - optimization_solver - 使用求解器: cbc
+2026-01-05 14:52:16,890 - INFO - optimization_solver - 求解状态: 成功
+2026-01-05 14:52:16,890 - INFO - optimization_solver - ----------------------------------------
+2026-01-05 14:52:16,892 - INFO - main - ----------------------------------------
+2026-01-05 14:52:17,073 - INFO - main - ----------------------------------------
+2026-01-05 14:52:18,386 - INFO - main - ----------------------------------------
+2026-01-05 14:52:18,403 - INFO - main -   - 总负荷: 126.0 MWh
+2026-01-05 14:52:18,403 - INFO - main -   - 可再生能源渗透率: 58.8%
+2026-01-05 14:52:18,403 - INFO - main -   - 自给自足率: 100.0%
+2026-01-05 14:52:18,403 - INFO - main -   - 净运行成本: -71,672 元
+2026-01-05 14:52:18,403 - INFO - main -   - 平均供电成本: -568.93 元/MWh
+2026-01-05 14:52:18,416 - INFO - main - 
+程序结束时间: 2026-01-05 14:52:18
+2026-01-05 14:52:18,416 - INFO - main - ================================================================================
+2026-01-05 14:54:30,256 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
+2026-01-05 14:54:30,292 - INFO - main - ----------------------------------------
+2026-01-05 14:54:30,292 - INFO - vpp_model - 能源系统验证通过
+2026-01-05 14:54:30,293 - INFO - main -   - 组件总数: 17
+2026-01-05 14:54:30,293 - INFO - main -   - 时间段数: 24
+2026-01-05 14:54:30,293 - INFO - main -   - 优化目标: cost_minimization
+2026-01-05 14:54:30,296 - INFO - main - ----------------------------------------
+2026-01-05 14:54:30,298 - INFO - optimization_solver - 使用指定的CBC路径: D:\py_work\vpp_opt_test_qqder\cbc/bin/cbc.exe
+2026-01-05 14:54:30,406 - INFO - optimization_solver - ==================================================
+2026-01-05 14:54:30,407 - INFO - optimization_solver - 开始优化求解...
+2026-01-05 14:54:30,407 - INFO - optimization_solver - ==================================================
+2026-01-05 14:54:30,407 - INFO - optimization_solver - 正在创建优化模型...
+2026-01-05 14:54:30,420 - INFO - optimization_solver - 优化模型创建成功
+2026-01-05 14:54:30,420 - INFO - optimization_solver - 执行预求解回调函数（添加自定义约束等）...
+2026-01-05 14:54:30,420 - INFO - main - 检测到辅助服务组件，正在添加耦合约束...
+2026-01-05 14:54:30,422 - ERROR - constraint - Rule failed when generating expression for Constraint storage_power_up_limit with index 0:
+AttributeError: 'Model' object has no attribute 'Flow'
+2026-01-05 14:54:30,422 - ERROR - block - Constructing component 'storage_power_up_limit' from data=None failed:
+    AttributeError: 'Model' object has no attribute 'Flow'
+2026-01-05 14:54:30,422 - ERROR - optimization_solver - 求解过程中发生错误: 'Model' object has no attribute 'Flow'
+2026-01-05 14:54:30,434 - INFO - main - 
+程序结束时间: 2026-01-05 14:54:30
+2026-01-05 14:54:30,434 - INFO - main - ================================================================================
+2026-01-05 14:58:02,980 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
+2026-01-05 14:58:02,997 - INFO - main - ----------------------------------------
+2026-01-05 14:58:02,997 - INFO - vpp_model - 能源系统验证通过
+2026-01-05 14:58:03,001 - INFO - main -   - 组件总数: 17
+2026-01-05 14:58:03,001 - INFO - main -   - 时间段数: 24
+2026-01-05 14:58:03,001 - INFO - main -   - 优化目标: cost_minimization
+2026-01-05 14:58:03,001 - INFO - main - ----------------------------------------
+2026-01-05 14:58:03,004 - INFO - optimization_solver - 使用指定的CBC路径: D:\py_work\vpp_opt_test_qqder\cbc/bin/cbc.exe
+2026-01-05 14:58:03,139 - INFO - optimization_solver - ==================================================
+2026-01-05 14:58:03,139 - INFO - optimization_solver - 开始优化求解...
+2026-01-05 14:58:03,139 - INFO - optimization_solver - ==================================================
+2026-01-05 14:58:03,139 - INFO - optimization_solver - 正在创建优化模型...
+2026-01-05 14:58:03,154 - INFO - optimization_solver - 优化模型创建成功
+2026-01-05 14:58:03,155 - INFO - optimization_solver - 执行预求解回调函数（添加自定义约束等）...
+2026-01-05 14:58:03,155 - INFO - main - 检测到辅助服务组件，正在添加耦合约束...
+2026-01-05 14:58:03,155 - INFO - vpp_model - 已成功添加辅助服务功率与能量耦合约束
+2026-01-05 14:58:03,155 - INFO - optimization_solver - 使用求解器: cbc
+2026-01-05 14:58:03,155 - INFO - optimization_solver - 求解器参数: {'tee': False, 'options': {'threads': 16, 'ratioGap': 0.01, 'timeLimit': 300}}
+2026-01-05 14:58:03,156 - INFO - optimization_solver - 使用Pyomo调用CBC: D:\py_work\vpp_opt_test_qqder\cbc/bin/cbc.exe
+2026-01-05 14:58:03,397 - INFO - optimization_solver - ----------------------------------------
+2026-01-05 14:58:03,397 - INFO - optimization_solver - 求解统计信息:
+2026-01-05 14:58:03,397 - INFO - optimization_solver - ----------------------------------------
+2026-01-05 14:58:03,397 - INFO - optimization_solver - 求解时间: 0.26 秒
+2026-01-05 14:58:03,397 - INFO - optimization_solver - 内存使用: 2.2 MB
+2026-01-05 14:58:03,397 - INFO - optimization_solver - 使用求解器: cbc
+2026-01-05 14:58:03,397 - INFO - optimization_solver - 求解状态: 成功
+2026-01-05 14:58:03,397 - INFO - optimization_solver - ----------------------------------------
+2026-01-05 14:58:03,402 - INFO - main - ----------------------------------------
+2026-01-05 14:58:03,471 - INFO - main - ----------------------------------------
+2026-01-05 14:58:06,319 - INFO - main - ----------------------------------------
+2026-01-05 14:58:06,351 - INFO - main -   - 总负荷: 126.0 MWh
+2026-01-05 14:58:06,351 - INFO - main -   - 可再生能源渗透率: 57.9%
+2026-01-05 14:58:06,351 - INFO - main -   - 自给自足率: 100.0%
+2026-01-05 14:58:06,351 - INFO - main -   - 净运行成本: -71,153 元
+2026-01-05 14:58:06,351 - INFO - main -   - 平均供电成本: -564.81 元/MWh
+2026-01-05 14:58:06,364 - INFO - main - 
+程序结束时间: 2026-01-05 14:58:06
+2026-01-05 14:58:06,364 - INFO - main - ================================================================================
+2026-01-05 15:07:04,939 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
+2026-01-05 15:07:04,955 - INFO - main - ----------------------------------------
+2026-01-05 15:07:04,955 - INFO - vpp_model - 能源系统验证通过
+2026-01-05 15:07:04,956 - INFO - main -   - 组件总数: 17
+2026-01-05 15:07:04,956 - INFO - main -   - 时间段数: 24
+2026-01-05 15:07:04,956 - INFO - main -   - 优化目标: cost_minimization
+2026-01-05 15:07:04,958 - INFO - main - ----------------------------------------
+2026-01-05 15:07:04,959 - INFO - optimization_solver - 使用指定的CBC路径: D:\py_work\vpp_opt_test_qqder\cbc/bin/cbc.exe
+2026-01-05 15:07:05,074 - INFO - optimization_solver - ==================================================
+2026-01-05 15:07:05,074 - INFO - optimization_solver - 开始优化求解...
+2026-01-05 15:07:05,074 - INFO - optimization_solver - ==================================================
+2026-01-05 15:07:05,074 - INFO - optimization_solver - 正在创建优化模型...
+2026-01-05 15:07:05,086 - INFO - optimization_solver - 优化模型创建成功
+2026-01-05 15:07:05,086 - INFO - optimization_solver - 执行预求解回调函数（添加自定义约束等）...
+2026-01-05 15:07:05,086 - INFO - main - 检测到辅助服务组件，正在添加耦合约束...
+2026-01-05 15:07:05,087 - INFO - vpp_model - 已成功添加辅助服务功率与能量耦合约束
+2026-01-05 15:07:05,087 - INFO - optimization_solver - 使用求解器: cbc
+2026-01-05 15:07:05,087 - INFO - optimization_solver - 求解器参数: {'tee': False, 'options': {'threads': 16, 'ratioGap': 0.01, 'timeLimit': 300}}
+2026-01-05 15:07:05,088 - INFO - optimization_solver - 使用Pyomo调用CBC: D:\py_work\vpp_opt_test_qqder\cbc/bin/cbc.exe
+2026-01-05 15:07:05,284 - INFO - optimization_solver - ----------------------------------------
+2026-01-05 15:07:05,284 - INFO - optimization_solver - 求解统计信息:
+2026-01-05 15:07:05,284 - INFO - optimization_solver - ----------------------------------------
+2026-01-05 15:07:05,284 - INFO - optimization_solver - 求解时间: 0.21 秒
+2026-01-05 15:07:05,284 - INFO - optimization_solver - 内存使用: 2.4 MB
+2026-01-05 15:07:05,284 - INFO - optimization_solver - 使用求解器: cbc
+2026-01-05 15:07:05,284 - INFO - optimization_solver - 求解状态: 成功
+2026-01-05 15:07:05,284 - INFO - optimization_solver - ----------------------------------------
+2026-01-05 15:07:05,285 - INFO - main - ----------------------------------------
+2026-01-05 15:07:05,338 - INFO - main - ----------------------------------------
+2026-01-05 15:07:06,675 - INFO - main - ----------------------------------------
+2026-01-05 15:07:06,691 - INFO - main -   - 总负荷: 126.0 MWh
+2026-01-05 15:07:06,691 - INFO - main -   - 可再生能源渗透率: 57.9%
+2026-01-05 15:07:06,691 - INFO - main -   - 自给自足率: 100.0%
+2026-01-05 15:07:06,691 - INFO - main -   - 净运行成本: -71,153 元
+2026-01-05 15:07:06,691 - INFO - main -   - 平均供电成本: -564.81 元/MWh
+2026-01-05 15:07:06,706 - INFO - main - 
+程序结束时间: 2026-01-05 15:07:06
+2026-01-05 15:07:06,707 - INFO - main - ================================================================================
+2026-01-05 15:07:09,706 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
+2026-01-05 15:07:09,714 - INFO - main - ----------------------------------------
+2026-01-05 15:07:09,714 - INFO - vpp_model - 能源系统验证通过
+2026-01-05 15:07:09,716 - INFO - main -   - 组件总数: 13
+2026-01-05 15:07:09,716 - INFO - main -   - 时间段数: 24
+2026-01-05 15:07:09,716 - INFO - main -   - 优化目标: cost_minimization
+2026-01-05 15:07:09,717 - INFO - main - ----------------------------------------
+2026-01-05 15:07:09,720 - INFO - optimization_solver - 使用指定的CBC路径: D:\py_work\vpp_opt_test_qqder\cbc/bin/cbc.exe
+2026-01-05 15:07:09,777 - INFO - optimization_solver - ==================================================
+2026-01-05 15:07:09,777 - INFO - optimization_solver - 开始优化求解...
+2026-01-05 15:07:09,777 - INFO - optimization_solver - ==================================================
+2026-01-05 15:07:09,777 - INFO - optimization_solver - 正在创建优化模型...
+2026-01-05 15:07:09,788 - INFO - optimization_solver - 优化模型创建成功
+2026-01-05 15:07:09,788 - INFO - optimization_solver - 执行预求解回调函数（添加自定义约束等）...
+2026-01-05 15:07:09,788 - INFO - main - 未检测到辅助服务组件，跳过耦合约束添加
+2026-01-05 15:07:09,788 - INFO - optimization_solver - 使用求解器: cbc
+2026-01-05 15:07:09,788 - INFO - optimization_solver - 求解器参数: {'tee': False, 'options': {'threads': 16, 'ratioGap': 0.01, 'timeLimit': 300}}
+2026-01-05 15:07:09,789 - INFO - optimization_solver - 使用Pyomo调用CBC: D:\py_work\vpp_opt_test_qqder\cbc/bin/cbc.exe
+2026-01-05 15:07:09,961 - INFO - optimization_solver - ----------------------------------------
+2026-01-05 15:07:09,961 - INFO - optimization_solver - 求解统计信息:
+2026-01-05 15:07:09,961 - INFO - optimization_solver - ----------------------------------------
+2026-01-05 15:07:09,961 - INFO - optimization_solver - 求解时间: 0.18 秒
+2026-01-05 15:07:09,961 - INFO - optimization_solver - 内存使用: 2.0 MB
+2026-01-05 15:07:09,961 - INFO - optimization_solver - 使用求解器: cbc
+2026-01-05 15:07:09,961 - INFO - optimization_solver - 求解状态: 成功
+2026-01-05 15:07:09,961 - INFO - optimization_solver - ----------------------------------------
+2026-01-05 15:07:09,963 - INFO - main - ----------------------------------------
+2026-01-05 15:07:10,017 - INFO - main - ----------------------------------------
+2026-01-05 15:07:11,525 - INFO - main - ----------------------------------------
+2026-01-05 15:07:11,551 - INFO - main -   - 总负荷: 126.0 MWh
+2026-01-05 15:07:11,553 - INFO - main -   - 可再生能源渗透率: 40.6%
+2026-01-05 15:07:11,553 - INFO - main -   - 自给自足率: 100.0%
+2026-01-05 15:07:11,553 - INFO - main -   - 净运行成本: -39,972 元
+2026-01-05 15:07:11,553 - INFO - main -   - 平均供电成本: -317.30 元/MWh
+2026-01-05 15:07:11,577 - INFO - main - 
+程序结束时间: 2026-01-05 15:07:11
+2026-01-05 15:07:11,577 - INFO - main - ================================================================================
+2026-01-05 15:08:35,071 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
+2026-01-05 15:08:35,082 - INFO - main - ----------------------------------------
+2026-01-05 15:08:35,082 - INFO - vpp_model - 能源系统验证通过
+2026-01-05 15:08:35,083 - INFO - main -   - 组件总数: 17
+2026-01-05 15:08:35,084 - INFO - main -   - 时间段数: 24
+2026-01-05 15:08:35,084 - INFO - main -   - 优化目标: cost_minimization
+2026-01-05 15:08:35,087 - INFO - main - ----------------------------------------
+2026-01-05 15:08:35,089 - INFO - optimization_solver - 使用指定的CBC路径: D:\py_work\vpp_opt_test_qqder\cbc/bin/cbc.exe
+2026-01-05 15:08:35,216 - INFO - optimization_solver - ==================================================
+2026-01-05 15:08:35,216 - INFO - optimization_solver - 开始优化求解...
+2026-01-05 15:08:35,216 - INFO - optimization_solver - ==================================================
+2026-01-05 15:08:35,216 - INFO - optimization_solver - 正在创建优化模型...
+2026-01-05 15:08:35,227 - INFO - optimization_solver - 优化模型创建成功
+2026-01-05 15:08:35,229 - INFO - optimization_solver - 执行预求解回调函数（添加自定义约束等）...
+2026-01-05 15:08:35,229 - INFO - main - 检测到辅助服务组件，正在添加耦合约束...
+2026-01-05 15:08:35,229 - INFO - vpp_model - 已成功添加辅助服务功率与能量耦合约束
+2026-01-05 15:08:35,229 - INFO - optimization_solver - 使用求解器: cbc
+2026-01-05 15:08:35,229 - INFO - optimization_solver - 求解器参数: {'tee': False, 'options': {'threads': 16, 'ratioGap': 0.01, 'timeLimit': 300}}
+2026-01-05 15:08:35,229 - INFO - optimization_solver - 使用Pyomo调用CBC: D:\py_work\vpp_opt_test_qqder\cbc/bin/cbc.exe
+2026-01-05 15:08:35,437 - INFO - optimization_solver - ----------------------------------------
+2026-01-05 15:08:35,437 - INFO - optimization_solver - 求解统计信息:
+2026-01-05 15:08:35,437 - INFO - optimization_solver - ----------------------------------------
+2026-01-05 15:08:35,437 - INFO - optimization_solver - 求解时间: 0.22 秒
+2026-01-05 15:08:35,437 - INFO - optimization_solver - 内存使用: 2.1 MB
+2026-01-05 15:08:35,437 - INFO - optimization_solver - 使用求解器: cbc
+2026-01-05 15:08:35,437 - INFO - optimization_solver - 求解状态: 成功
+2026-01-05 15:08:35,437 - INFO - optimization_solver - ----------------------------------------
+2026-01-05 15:08:35,439 - INFO - main - ----------------------------------------
+2026-01-05 15:08:35,512 - INFO - main - ----------------------------------------
+2026-01-05 15:08:36,922 - INFO - main - ----------------------------------------
+2026-01-05 15:08:36,987 - INFO - main -   - 总负荷: 126.0 MWh
+2026-01-05 15:08:36,987 - INFO - main -   - 可再生能源渗透率: 57.9%
+2026-01-05 15:08:36,987 - INFO - main -   - 自给自足率: 100.0%
+2026-01-05 15:08:36,987 - INFO - main -   - 净运行成本: -71,153 元
+2026-01-05 15:08:36,987 - INFO - main -   - 平均供电成本: -564.81 元/MWh
+2026-01-05 15:08:37,027 - INFO - main - 
+程序结束时间: 2026-01-05 15:08:37
+2026-01-05 15:08:37,027 - INFO - main - ================================================================================
+2026-01-05 15:11:33,066 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
+2026-01-05 15:11:33,075 - INFO - main - ----------------------------------------
+2026-01-05 15:11:33,075 - INFO - vpp_model - 能源系统验证通过
+2026-01-05 15:11:33,076 - INFO - main -   - 组件总数: 17
+2026-01-05 15:11:33,076 - INFO - main -   - 时间段数: 24
+2026-01-05 15:11:33,076 - INFO - main -   - 优化目标: cost_minimization
+2026-01-05 15:11:33,076 - INFO - main - ----------------------------------------
+2026-01-05 15:11:33,079 - INFO - optimization_solver - 使用指定的CBC路径: D:\py_work\vpp_opt_test_qqder\cbc/bin/cbc.exe
+2026-01-05 15:11:33,180 - INFO - optimization_solver - ==================================================
+2026-01-05 15:11:33,180 - INFO - optimization_solver - 开始优化求解...
+2026-01-05 15:11:33,180 - INFO - optimization_solver - ==================================================
+2026-01-05 15:11:33,182 - INFO - optimization_solver - 正在创建优化模型...
+2026-01-05 15:11:33,192 - INFO - optimization_solver - 优化模型创建成功
+2026-01-05 15:11:33,192 - INFO - optimization_solver - 执行预求解回调函数（添加自定义约束等）...
+2026-01-05 15:11:33,192 - INFO - main - 检测到辅助服务组件，正在添加耦合约束...
+2026-01-05 15:11:33,194 - INFO - vpp_model - 已成功添加辅助服务功率与能量耦合约束
+2026-01-05 15:11:33,194 - INFO - optimization_solver - 使用求解器: cbc
+2026-01-05 15:11:33,194 - INFO - optimization_solver - 求解器参数: {'tee': False, 'options': {'threads': 16, 'ratioGap': 0.01, 'timeLimit': 300}}
+2026-01-05 15:11:33,194 - INFO - optimization_solver - 使用Pyomo调用CBC: D:\py_work\vpp_opt_test_qqder\cbc/bin/cbc.exe
+2026-01-05 15:11:33,369 - INFO - optimization_solver - ----------------------------------------
+2026-01-05 15:11:33,369 - INFO - optimization_solver - 求解统计信息:
+2026-01-05 15:11:33,369 - INFO - optimization_solver - ----------------------------------------
+2026-01-05 15:11:33,369 - INFO - optimization_solver - 求解时间: 0.19 秒
+2026-01-05 15:11:33,369 - INFO - optimization_solver - 内存使用: 2.1 MB
+2026-01-05 15:11:33,369 - INFO - optimization_solver - 使用求解器: cbc
+2026-01-05 15:11:33,369 - INFO - optimization_solver - 求解状态: 成功
+2026-01-05 15:11:33,369 - INFO - optimization_solver - ----------------------------------------
+2026-01-05 15:11:33,372 - INFO - main - ----------------------------------------
+2026-01-05 15:11:33,424 - INFO - main - ----------------------------------------
+2026-01-05 15:11:34,886 - INFO - main - ----------------------------------------
+2026-01-05 15:11:34,921 - INFO - main -   - 总负荷: 126.0 MWh
+2026-01-05 15:11:34,922 - INFO - main -   - 可再生能源渗透率: 57.9%
+2026-01-05 15:11:34,922 - INFO - main -   - 自给自足率: 100.0%
+2026-01-05 15:11:34,922 - INFO - main -   - 净运行成本: -71,153 元
+2026-01-05 15:11:34,922 - INFO - main -   - 平均供电成本: -564.81 元/MWh
+2026-01-05 15:11:34,940 - INFO - main - 
+程序结束时间: 2026-01-05 15:11:34
+2026-01-05 15:11:34,940 - INFO - main - ================================================================================
+2026-01-05 15:12:12,752 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
+2026-01-05 15:12:12,765 - INFO - main - ----------------------------------------
+2026-01-05 15:12:12,765 - INFO - vpp_model - 能源系统验证通过
+2026-01-05 15:12:12,765 - INFO - main -   - 组件总数: 17
+2026-01-05 15:12:12,765 - INFO - main -   - 时间段数: 24
+2026-01-05 15:12:12,765 - INFO - main -   - 优化目标: cost_minimization
+2026-01-05 15:12:12,766 - INFO - main - ----------------------------------------
+2026-01-05 15:12:12,770 - INFO - optimization_solver - 使用指定的CBC路径: D:\py_work\vpp_opt_test_qqder\cbc/bin/cbc.exe
+2026-01-05 15:12:12,866 - INFO - optimization_solver - ==================================================
+2026-01-05 15:12:12,866 - INFO - optimization_solver - 开始优化求解...
+2026-01-05 15:12:12,866 - INFO - optimization_solver - ==================================================
+2026-01-05 15:12:12,866 - INFO - optimization_solver - 正在创建优化模型...
+2026-01-05 15:12:12,884 - INFO - optimization_solver - 优化模型创建成功
+2026-01-05 15:12:12,884 - INFO - optimization_solver - 执行预求解回调函数（添加自定义约束等）...
+2026-01-05 15:12:12,884 - INFO - main - 检测到辅助服务组件，正在添加耦合约束...
+2026-01-05 15:12:12,886 - INFO - vpp_model - 已成功添加辅助服务功率与能量耦合约束
+2026-01-05 15:12:12,887 - INFO - optimization_solver - 使用求解器: cbc
+2026-01-05 15:12:12,887 - INFO - optimization_solver - 求解器参数: {'tee': False, 'options': {'threads': 16, 'ratioGap': 0.01, 'timeLimit': 300}}
+2026-01-05 15:12:12,887 - INFO - optimization_solver - 使用Pyomo调用CBC: D:\py_work\vpp_opt_test_qqder\cbc/bin/cbc.exe
+2026-01-05 15:12:13,099 - INFO - optimization_solver - ----------------------------------------
+2026-01-05 15:12:13,101 - INFO - optimization_solver - 求解统计信息:
+2026-01-05 15:12:13,101 - INFO - optimization_solver - ----------------------------------------
+2026-01-05 15:12:13,101 - INFO - optimization_solver - 求解时间: 0.23 秒
+2026-01-05 15:12:13,101 - INFO - optimization_solver - 内存使用: 2.1 MB
+2026-01-05 15:12:13,101 - INFO - optimization_solver - 使用求解器: cbc
+2026-01-05 15:12:13,101 - INFO - optimization_solver - 求解状态: 成功
+2026-01-05 15:12:13,101 - INFO - optimization_solver - ----------------------------------------
+2026-01-05 15:12:13,102 - INFO - main - ----------------------------------------
+2026-01-05 15:12:13,198 - INFO - main - ----------------------------------------
+2026-01-05 15:12:15,053 - INFO - main - ----------------------------------------
+2026-01-05 15:12:15,096 - INFO - main -   - 总负荷: 126.0 MWh
+2026-01-05 15:12:15,096 - INFO - main -   - 可再生能源渗透率: 57.9%
+2026-01-05 15:12:15,096 - INFO - main -   - 自给自足率: 100.0%
+2026-01-05 15:12:15,096 - INFO - main -   - 净运行成本: -71,153 元
+2026-01-05 15:12:15,096 - INFO - main -   - 平均供电成本: -564.81 元/MWh
+2026-01-05 15:12:15,116 - INFO - main - 
+程序结束时间: 2026-01-05 15:12:15
+2026-01-05 15:12:15,116 - INFO - main - ================================================================================
+2026-01-05 15:12:58,908 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
+2026-01-05 15:12:58,919 - INFO - main - ----------------------------------------
+2026-01-05 15:12:58,919 - INFO - vpp_model - 能源系统验证通过
+2026-01-05 15:12:58,920 - INFO - main -   - 组件总数: 17
+2026-01-05 15:12:58,920 - INFO - main -   - 时间段数: 24
+2026-01-05 15:12:58,920 - INFO - main -   - 优化目标: cost_minimization
+2026-01-05 15:12:58,921 - INFO - main - ----------------------------------------
+2026-01-05 15:12:58,924 - INFO - optimization_solver - 使用指定的CBC路径: D:\py_work\vpp_opt_test_qqder\cbc/bin/cbc.exe
+2026-01-05 15:12:59,019 - INFO - optimization_solver - ==================================================
+2026-01-05 15:12:59,019 - INFO - optimization_solver - 开始优化求解...
+2026-01-05 15:12:59,020 - INFO - optimization_solver - ==================================================
+2026-01-05 15:12:59,020 - INFO - optimization_solver - 正在创建优化模型...
+2026-01-05 15:12:59,028 - INFO - optimization_solver - 优化模型创建成功
+2026-01-05 15:12:59,028 - INFO - optimization_solver - 执行预求解回调函数（添加自定义约束等）...
+2026-01-05 15:12:59,028 - INFO - main - 检测到辅助服务组件，正在添加耦合约束...
+2026-01-05 15:12:59,029 - INFO - vpp_model - 已成功添加辅助服务功率与能量耦合约束
+2026-01-05 15:12:59,029 - INFO - optimization_solver - 使用求解器: cbc
+2026-01-05 15:12:59,029 - INFO - optimization_solver - 求解器参数: {'tee': False, 'options': {'threads': 16, 'ratioGap': 0.01, 'timeLimit': 300}}
+2026-01-05 15:12:59,029 - INFO - optimization_solver - 使用Pyomo调用CBC: D:\py_work\vpp_opt_test_qqder\cbc/bin/cbc.exe
+2026-01-05 15:12:59,196 - INFO - optimization_solver - ----------------------------------------
+2026-01-05 15:12:59,196 - INFO - optimization_solver - 求解统计信息:
+2026-01-05 15:12:59,196 - INFO - optimization_solver - ----------------------------------------
+2026-01-05 15:12:59,196 - INFO - optimization_solver - 求解时间: 0.18 秒
+2026-01-05 15:12:59,196 - INFO - optimization_solver - 内存使用: 2.1 MB
+2026-01-05 15:12:59,196 - INFO - optimization_solver - 使用求解器: cbc
+2026-01-05 15:12:59,196 - INFO - optimization_solver - 求解状态: 成功
+2026-01-05 15:12:59,196 - INFO - optimization_solver - ----------------------------------------
+2026-01-05 15:12:59,197 - INFO - main - ----------------------------------------
+2026-01-05 15:12:59,252 - INFO - main - ----------------------------------------
+2026-01-05 15:13:00,622 - INFO - main - ----------------------------------------
+2026-01-05 15:13:00,647 - INFO - main -   - 总负荷: 126.0 MWh
+2026-01-05 15:13:00,647 - INFO - main -   - 可再生能源渗透率: 57.9%
+2026-01-05 15:13:00,647 - INFO - main -   - 自给自足率: 100.0%
+2026-01-05 15:13:00,647 - INFO - main -   - 净运行成本: -71,153 元
+2026-01-05 15:13:00,647 - INFO - main -   - 平均供电成本: -564.81 元/MWh
+2026-01-05 15:13:00,663 - INFO - main - 
+程序结束时间: 2026-01-05 15:13:00
+2026-01-05 15:13:00,663 - INFO - main - ================================================================================
+2026-01-05 15:17:45,332 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
+2026-01-05 15:17:45,337 - INFO - main - 
+>> 步骤2.1: 验证能源系统
+2026-01-05 15:17:45,337 - INFO - main - ----------------------------------------
+2026-01-05 15:17:45,337 - INFO - vpp_model - 能源系统验证通过
+2026-01-05 15:17:45,337 - INFO - main - [OK] 能源系统构建完成
+2026-01-05 15:17:45,337 - INFO - main -   - 组件总数: 17
+2026-01-05 15:17:45,337 - INFO - main -   - 时间段数: 24
+2026-01-05 15:17:45,337 - INFO - main -   - 优化目标: cost_minimization
+2026-01-05 15:17:45,337 - INFO - main - 
+>> 步骤3: 执行优化求解
+2026-01-05 15:17:45,337 - INFO - main - ----------------------------------------
+2026-01-05 15:17:45,343 - INFO - optimization_solver - 使用指定的CBC路径: D:\py_work\vpp_opt_test_qqder\cbc/bin/cbc.exe
+2026-01-05 15:17:45,470 - INFO - optimization_solver - ==================================================
+2026-01-05 15:17:45,471 - INFO - optimization_solver - 开始优化求解...
+2026-01-05 15:17:45,471 - INFO - optimization_solver - ==================================================
+2026-01-05 15:17:45,471 - INFO - optimization_solver - 正在创建优化模型...
+2026-01-05 15:17:45,480 - INFO - optimization_solver - 优化模型创建成功
+2026-01-05 15:17:45,480 - INFO - optimization_solver - 执行预求解回调函数（添加自定义约束等）...
+2026-01-05 15:17:45,480 - INFO - main - 检测到辅助服务组件，正在添加耦合约束...
+2026-01-05 15:17:45,480 - INFO - vpp_model - 已成功添加辅助服务功率与能量耦合约束
+2026-01-05 15:17:45,480 - INFO - optimization_solver - 使用求解器: cbc
+2026-01-05 15:17:45,480 - INFO - optimization_solver - 求解器参数: {'tee': False, 'options': {'threads': 16, 'ratioGap': 0.01, 'timeLimit': 300}}
+2026-01-05 15:17:45,481 - INFO - optimization_solver - 使用Pyomo调用CBC: D:\py_work\vpp_opt_test_qqder\cbc/bin/cbc.exe
+2026-01-05 15:17:45,743 - INFO - optimization_solver - ----------------------------------------
+2026-01-05 15:17:45,743 - INFO - optimization_solver - 求解统计信息:
+2026-01-05 15:17:45,743 - INFO - optimization_solver - ----------------------------------------
+2026-01-05 15:17:45,743 - INFO - optimization_solver - 求解时间: 0.27 秒
+2026-01-05 15:17:45,743 - INFO - optimization_solver - 内存使用: 2.0 MB
+2026-01-05 15:17:45,744 - INFO - optimization_solver - 使用求解器: cbc
+2026-01-05 15:17:45,744 - INFO - optimization_solver - 求解状态: 成功
+2026-01-05 15:17:45,744 - INFO - optimization_solver - ----------------------------------------
+2026-01-05 15:17:45,744 - INFO - main - 
+>> 步骤4: 分析优化结果
+2026-01-05 15:17:45,744 - INFO - main - ----------------------------------------
+2026-01-05 15:17:45,802 - INFO - main - [OK] 结果分析完成，已保存 4 个文件
+2026-01-05 15:17:45,802 - INFO - main - 
+>> 步骤5: 生成可视化图表
+2026-01-05 15:17:45,802 - INFO - main - ----------------------------------------
+2026-01-05 15:17:47,281 - INFO - main - [OK] 可视化图表已生成: outputs\full_system_cost_minimization_20260105_151745\plots\optimization_results.png
+2026-01-05 15:17:47,281 - INFO - main - 
+>> 步骤6: 生成模式总结报告
+2026-01-05 15:17:47,281 - INFO - main - ----------------------------------------
+2026-01-05 15:17:47,290 - INFO - main - [OK] 模式总结报告已生成: outputs\full_system_cost_minimization_20260105_151745\reports\mode_summary_report.txt
+2026-01-05 15:17:47,290 - INFO - main - 
+[METRICS] 关键指标:
+2026-01-05 15:17:47,290 - INFO - main -   - 总负荷: 126.0 MWh
+2026-01-05 15:17:47,290 - INFO - main -   - 可再生能源渗透率: 57.9%
+2026-01-05 15:17:47,290 - INFO - main -   - 自给自足率: 100.0%
+2026-01-05 15:17:47,290 - INFO - main -   - 净运行成本: -71,153 元
+2026-01-05 15:17:47,290 - INFO - main -   - 平均供电成本: -564.81 元/MWh
+2026-01-05 15:17:47,290 - INFO - main - 
+[COMPLETE] full_system 调度模式（cost_minimization）优化完成！
+2026-01-05 15:17:47,290 - INFO - main - [TIME] 总耗时: 2.00 秒
+2026-01-05 15:17:47,290 - INFO - main - [DIR] 会话目录: outputs\full_system_cost_minimization_20260105_151745
+2026-01-05 15:17:47,296 - INFO - main - 
+[SUCCESS] full_system 调度模式（cost_minimization）运行成功！
+2026-01-05 15:17:47,298 - INFO - main - 
+程序结束时间: 2026-01-05 15:17:47
+2026-01-05 15:17:47,298 - INFO - main - ================================================================================
+2026-01-05 15:21:51,271 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
+2026-01-05 15:21:51,282 - INFO - main - 
+>> 步骤2.1: 验证能源系统
+2026-01-05 15:21:51,282 - INFO - main - ----------------------------------------
+2026-01-05 15:21:51,282 - INFO - vpp_model - 能源系统验证通过
+2026-01-05 15:21:51,282 - INFO - main - [OK] 能源系统构建完成
+2026-01-05 15:21:51,282 - INFO - main -   - 组件总数: 17
+2026-01-05 15:21:51,283 - INFO - main -   - 时间段数: 24
+2026-01-05 15:21:51,283 - INFO - main -   - 优化目标: cost_minimization
+2026-01-05 15:21:51,284 - INFO - main - 
+>> 步骤3: 执行优化求解
+2026-01-05 15:21:51,284 - INFO - main - ----------------------------------------
+2026-01-05 15:21:51,286 - INFO - optimization_solver - 使用指定的CBC路径: D:\py_work\vpp_opt_test_qqder\cbc/bin/cbc.exe
+2026-01-05 15:21:51,402 - INFO - optimization_solver - [OK] CBC求解器验证成功
+2026-01-05 15:21:51,402 - INFO - optimization_solver - ==================================================
+2026-01-05 15:21:51,403 - INFO - optimization_solver - 开始优化求解...
+2026-01-05 15:21:51,403 - INFO - optimization_solver - ==================================================
+2026-01-05 15:21:51,403 - INFO - optimization_solver - 正在创建优化模型...
+2026-01-05 15:21:51,412 - INFO - optimization_solver - 优化模型创建成功
+2026-01-05 15:21:51,412 - INFO - optimization_solver - 执行预求解回调函数（添加自定义约束等）...
+2026-01-05 15:21:51,412 - INFO - main - 检测到辅助服务组件，正在添加耦合约束...
+2026-01-05 15:21:51,414 - INFO - vpp_model - 已成功添加辅助服务功率与能量耦合约束
+2026-01-05 15:21:51,414 - INFO - optimization_solver - 使用求解器: cbc
+2026-01-05 15:21:51,415 - INFO - optimization_solver - 求解器参数: {'tee': False, 'options': {'threads': 16, 'ratioGap': 0.01, 'timeLimit': 300}}
+2026-01-05 15:21:51,415 - INFO - optimization_solver - 使用Pyomo调用CBC: D:\py_work\vpp_opt_test_qqder\cbc/bin/cbc.exe
+2026-01-05 15:21:51,628 - INFO - optimization_solver - [OK] 解验证通过
+2026-01-05 15:21:51,629 - INFO - optimization_solver - [OK] 优化求解成功完成
+2026-01-05 15:21:51,631 - INFO - optimization_solver - ----------------------------------------
+2026-01-05 15:21:51,631 - INFO - optimization_solver - 求解统计信息:
+2026-01-05 15:21:51,631 - INFO - optimization_solver - ----------------------------------------
+2026-01-05 15:21:51,631 - INFO - optimization_solver - 求解时间: 0.23 秒
+2026-01-05 15:21:51,631 - INFO - optimization_solver - 内存使用: 2.0 MB
+2026-01-05 15:21:51,631 - INFO - optimization_solver - 使用求解器: cbc
+2026-01-05 15:21:51,631 - INFO - optimization_solver - 求解状态: 成功
+2026-01-05 15:21:51,631 - INFO - optimization_solver - ----------------------------------------
+2026-01-05 15:21:51,632 - INFO - main - 
+>> 步骤4: 分析优化结果
+2026-01-05 15:21:51,633 - INFO - main - ----------------------------------------
+2026-01-05 15:21:51,677 - INFO - main - [OK] 结果分析完成，已保存 4 个文件
+2026-01-05 15:21:51,678 - INFO - main - 
+>> 步骤5: 生成可视化图表
+2026-01-05 15:21:51,678 - INFO - main - ----------------------------------------
+2026-01-05 15:21:53,536 - INFO - main - [OK] 可视化图表已生成: outputs\full_system_cost_minimization_20260105_152151\plots\optimization_results.png
+2026-01-05 15:21:53,536 - INFO - main - 
+>> 步骤6: 生成模式总结报告
+2026-01-05 15:21:53,536 - INFO - main - ----------------------------------------
+2026-01-05 15:21:53,553 - INFO - main - [OK] 模式总结报告已生成: outputs\full_system_cost_minimization_20260105_152151\reports\mode_summary_report.txt
+2026-01-05 15:21:53,553 - INFO - main - 
+[METRICS] 关键指标:
+2026-01-05 15:21:53,553 - INFO - main -   - 总负荷: 126.0 MWh
+2026-01-05 15:21:53,553 - INFO - main -   - 可再生能源渗透率: 57.9%
+2026-01-05 15:21:53,553 - INFO - main -   - 自给自足率: 100.0%
+2026-01-05 15:21:53,553 - INFO - main -   - 净运行成本: -71,153 元
+2026-01-05 15:21:53,553 - INFO - main -   - 平均供电成本: -564.81 元/MWh
+2026-01-05 15:21:53,553 - INFO - main - 
+[COMPLETE] full_system 调度模式（cost_minimization）优化完成！
+2026-01-05 15:21:53,553 - INFO - main - [TIME] 总耗时: 2.35 秒
+2026-01-05 15:21:53,553 - INFO - main - [DIR] 会话目录: outputs\full_system_cost_minimization_20260105_152151
+2026-01-05 15:21:53,559 - INFO - main - 
+[SUCCESS] full_system 调度模式（cost_minimization）运行成功！
+2026-01-05 15:21:53,559 - INFO - main - 
+程序结束时间: 2026-01-05 15:21:53
+2026-01-05 15:21:53,559 - INFO - main - ================================================================================
+2026-01-05 15:33:46,695 - INFO - logger - Path for logging: D:\py_work\vpp_opt_test_qqder\logs\vpp_optimization.log
+2026-01-05 15:33:46,700 - INFO - main - 
+>> 步骤2.1: 验证能源系统
+2026-01-05 15:33:46,700 - INFO - main - ----------------------------------------
+2026-01-05 15:33:46,700 - INFO - vpp_model - 能源系统验证通过
+2026-01-05 15:33:46,700 - INFO - main - [OK] 能源系统构建完成
+2026-01-05 15:33:46,700 - INFO - main -   - 组件总数: 10
+2026-01-05 15:33:46,700 - INFO - main -   - 时间段数: 24
+2026-01-05 15:33:46,700 - INFO - main -   - 优化目标: cost_minimization
+2026-01-05 15:33:46,700 - INFO - main - 
+>> 步骤3: 执行优化求解
+2026-01-05 15:33:46,700 - INFO - main - ----------------------------------------
+2026-01-05 15:33:46,704 - INFO - optimization_solver - 使用指定的CBC路径: D:\py_work\vpp_opt_test_qqder\cbc/bin/cbc.exe
+2026-01-05 15:33:46,881 - INFO - optimization_solver - [OK] CBC求解器验证成功
+2026-01-05 15:33:46,881 - INFO - optimization_solver - ==================================================
+2026-01-05 15:33:46,881 - INFO - optimization_solver - 开始优化求解...
+2026-01-05 15:33:46,881 - INFO - optimization_solver - ==================================================
+2026-01-05 15:33:46,881 - INFO - optimization_solver - 正在创建优化模型...
+2026-01-05 15:33:46,893 - INFO - optimization_solver - 优化模型创建成功
+2026-01-05 15:33:46,893 - INFO - optimization_solver - 执行预求解回调函数（添加自定义约束等）...
+2026-01-05 15:33:46,894 - INFO - main - 未检测到辅助服务组件，跳过耦合约束添加
+2026-01-05 15:33:46,894 - INFO - optimization_solver - 使用求解器: cbc
+2026-01-05 15:33:46,894 - INFO - optimization_solver - 求解器参数: {'tee': False, 'options': {'threads': 16, 'ratioGap': 0.01, 'timeLimit': 300}}
+2026-01-05 15:33:46,894 - INFO - optimization_solver - 使用Pyomo调用CBC: D:\py_work\vpp_opt_test_qqder\cbc/bin/cbc.exe
+2026-01-05 15:33:47,054 - INFO - optimization_solver - [OK] 解验证通过
+2026-01-05 15:33:47,055 - INFO - optimization_solver - [OK] 优化求解成功完成
+2026-01-05 15:33:47,055 - INFO - optimization_solver - ----------------------------------------
+2026-01-05 15:33:47,055 - INFO - optimization_solver - 求解统计信息:
+2026-01-05 15:33:47,055 - INFO - optimization_solver - ----------------------------------------
+2026-01-05 15:33:47,055 - INFO - optimization_solver - 求解时间: 0.17 秒
+2026-01-05 15:33:47,055 - INFO - optimization_solver - 内存使用: 1.8 MB
+2026-01-05 15:33:47,055 - INFO - optimization_solver - 使用求解器: cbc
+2026-01-05 15:33:47,055 - INFO - optimization_solver - 求解状态: 成功
+2026-01-05 15:33:47,055 - INFO - optimization_solver - ----------------------------------------
+2026-01-05 15:33:47,055 - INFO - main - 
+>> 步骤4: 分析优化结果
+2026-01-05 15:33:47,055 - INFO - main - ----------------------------------------
+2026-01-05 15:33:47,114 - INFO - main - [OK] 结果分析完成，已保存 4 个文件
+2026-01-05 15:33:47,115 - INFO - main - 
+>> 步骤5: 生成可视化图表
+2026-01-05 15:33:47,115 - INFO - main - ----------------------------------------
+2026-01-05 15:33:48,470 - INFO - main - [OK] 可视化图表已生成: outputs\renewable_storage_cost_minimization_20260105_153346\plots\optimization_results.png
+2026-01-05 15:33:48,470 - INFO - main - 
+>> 步骤6: 生成模式总结报告
+2026-01-05 15:33:48,470 - INFO - main - ----------------------------------------
+2026-01-05 15:33:48,480 - INFO - main - [OK] 模式总结报告已生成: outputs\renewable_storage_cost_minimization_20260105_153346\reports\mode_summary_report.txt
+2026-01-05 15:33:48,480 - INFO - main - 
+[METRICS] 关键指标:
+2026-01-05 15:33:48,480 - INFO - main -   - 总负荷: 126.0 MWh
+2026-01-05 15:33:48,480 - INFO - main -   - 可再生能源渗透率: 100.0%
+2026-01-05 15:33:48,480 - INFO - main -   - 自给自足率: 100.0%
+2026-01-05 15:33:48,481 - INFO - main -   - 净运行成本: -15,395 元
+2026-01-05 15:33:48,481 - INFO - main -   - 平均供电成本: -122.20 元/MWh
+2026-01-05 15:33:48,481 - INFO - main - 
+[COMPLETE] renewable_storage 调度模式（cost_minimization）优化完成！
+2026-01-05 15:33:48,481 - INFO - main - [TIME] 总耗时: 1.84 秒
+2026-01-05 15:33:48,481 - INFO - main - [DIR] 会话目录: outputs\renewable_storage_cost_minimization_20260105_153346
+2026-01-05 15:33:48,489 - INFO - main - 
+程序结束时间: 2026-01-05 15:33:48
+2026-01-05 15:33:48,490 - INFO - main - ================================================================================

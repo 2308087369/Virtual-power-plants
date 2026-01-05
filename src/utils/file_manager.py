@@ -133,7 +133,7 @@ class VPPFileManager:
             with open(file_path, 'w', encoding='utf-8') as f:
                 f.write(str(data))
         
-        print(f"✓ 文件已保存: {file_path}")
+        print(f"[OK] 文件已保存: {file_path}")
         return file_path
     
     def copy_file_to_session(self,
@@ -159,7 +159,7 @@ class VPPFileManager:
         target_path = self.get_file_path(session_dir, file_type, new_filename)
         
         shutil.copy2(source_path, target_path)
-        print(f"✓ 文件已复制: {source_path} -> {target_path}")
+        print(f"[OK] 文件已复制: {source_path} -> {target_path}")
         
         return target_path
     
@@ -206,7 +206,7 @@ class VPPFileManager:
             import json
             json.dump(manifest, f, ensure_ascii=False, indent=2)
         
-        print(f"✓ 会话清单已创建: {manifest_path}")
+        print(f"[OK] 会话清单已创建: {manifest_path}")
         return manifest_path
     
     def cleanup_legacy_files(self, dry_run: bool = True) -> Dict[str, List[str]]:
@@ -257,7 +257,7 @@ class VPPFileManager:
                 if dir_path.exists():
                     shutil.move(str(dir_path), str(archive_session_dir / dir_path.name))
             
-            print(f"✓ 旧文件已归档到: {archive_session_dir}")
+            print(f"[OK] 旧文件已归档到: {archive_session_dir}")
         
         return cleanup_info
     
@@ -365,7 +365,7 @@ class SessionContext:
         self.session_dir = self.file_manager.create_session_directory(
             self.mode, self.objective, self.timestamp
         )
-        print(f"🗂️  会话目录已创建: {self.session_dir}")
+        print(f"[DIR] 会话目录已创建: {self.session_dir}")
         return self
     
     def __exit__(self, exc_type, exc_val, exc_tb):
@@ -375,7 +375,7 @@ class SessionContext:
             self.file_manager.create_session_manifest(
                 self.session_dir, self.mode, self.objective
             )
-            print(f"📋 会话已完成: {self.session_dir.name}")
+            print(f"[MANIFEST] 会话已完成: {self.session_dir.name}")
     
     def save_file(self, file_type: str, filename: str, data, **kwargs) -> Path:
         """保存文件到当前会话"""

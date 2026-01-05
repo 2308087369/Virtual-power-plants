@@ -306,8 +306,8 @@ class VPPSchedulingManager:
     def set_optimization_objective(self, objective: OptimizationObjective):
         """设置当前优化目标"""
         self.current_objective = objective
-        print(f"⚙️ 已设置优化目标: {objective.value}")
-        print(f"🎯 目标描述: {self.get_optimization_objective_description(objective)}")
+        print(f"[CONFIG] 已设置优化目标: {objective.value}")
+        print(f"[TARGET] 目标描述: {self.get_optimization_objective_description(objective)}")
     
     def create_optimized_model(self, mode: SchedulingMode, time_index: pd.DatetimeIndex, 
                              objective: OptimizationObjective = None) -> 'OptimizedVPPModel':
@@ -330,10 +330,10 @@ class VPPSchedulingManager:
         mode_config = self.mode_configs[mode]
         objective_config = self.objective_configs[objective]
         
-        print(f"\n🔧 创建调度模式: {mode.value}")
-        print(f"📝 模式描述: {self.get_mode_description(mode)}")
-        print(f"⚙️ 优化目标: {objective.value}")
-        print(f"🎯 目标函数: {self.get_objective_function_description(mode, objective)}")
+        print(f"\n[SETUP] 创建调度模式: {mode.value}")
+        print(f"[INFO] 模式描述: {self.get_mode_description(mode)}")
+        print(f"[CONFIG] 优化目标: {objective.value}")
+        print(f"[TARGET] 目标函数: {self.get_objective_function_description(mode, objective)}")
         
         return OptimizedVPPModel(time_index, mode_config, mode, objective_config, objective)
     
@@ -514,14 +514,71 @@ class OptimizedVPPModel(VPPOptimizationModel):
         
         print(f"分离式储能建模 - 充电功率: 0-{available_power_capacity} MW, 放电功率: 0-{available_power_capacity} MW")
         print(f"储能容量: {battery_config['energy_capacity_mwh']} MWh, SOC范围: {battery_config.get('min_soc', 0.1)*100}%-{battery_config.get('max_soc', 0.95)*100}%")
-        print("✅ 分离式建模保证：1)功率约束严格执行 2)充放电天然互斥（不同Converter）")
+        print("[OK] 分离式建模保证：1)功率约束严格执行 2)充放电天然互斥（不同Converter）")
         
         storage_components = [battery_bus, battery_charger, battery_discharger, battery_tank]
         
-        # 暂时禁用辅助服务组件以解决储能约束冲突问题
-        # 辅助服务组件作为独立组件会绕过储能的SOC和容量约束
-        # TODO: 未来需要实现辅助服务与储能的正确耦合约束
-        print("注意：为解决储能约束问题，暂时禁用辅助服务组件")
+        # 创建辅助服务组件
+        # 注意：这些组件需要与储能系统通过 add_ancillary_service_constraints 耦合
+        if freq_reg_config.get('enable', False):
+            # 向上调频服务 (Source -> Bus)
+            freq_reg_up = solph.components.Source(
+                label="freq_reg_up_service",
+                outputs={
+                    self.components['bus_electricity']: solph.Flow(
+                        nominal_value=freq_reg_config.get('max_capacity_mw', total_power_capacity * 0.5),
+                        variable_costs=self._apply_objective_weights(
+                            self._apply_objective_config_to_flow(freq_reg_config.get('up_price_yuan_mw', 80), is_revenue=True),
+                            'ancillary'
+                        )
+                    )
+                }
+            )
+            # 向下调频服务 (Bus -> Sink)
+            freq_reg_down = solph.components.Sink(
+                label="freq_reg_down_service",
+                inputs={
+                    self.components['bus_electricity']: solph.Flow(
+                        nominal_value=freq_reg_config.get('max_capacity_mw', total_power_capacity * 0.5),
+                        variable_costs=self._apply_objective_weights(
+                            self._apply_objective_config_to_flow(freq_reg_config.get('down_price_yuan_mw', 70), is_revenue=True),
+                            'ancillary'
+                        )
+                    )
+                }
+            )
+            storage_components.extend([freq_reg_up, freq_reg_down])
+            print(f"已在模型中添加调频辅助服务组件: {freq_reg_config.get('max_capacity_mw')} MW")
+            
+        if spin_reserve_config.get('enable', False):
+            # 向上旋转备用 (Source -> Bus)
+            spin_reserve_up = solph.components.Source(
+                label="spin_reserve_up_service",
+                outputs={
+                    self.components['bus_electricity']: solph.Flow(
+                        nominal_value=spin_reserve_config.get('max_capacity_mw', total_power_capacity * 0.5),
+                        variable_costs=self._apply_objective_weights(
+                            self._apply_objective_config_to_flow(spin_reserve_config.get('up_price_yuan_mw', 60), is_revenue=True),
+                            'ancillary'
+                        )
+                    )
+                }
+            )
+            # 向下旋转备用 (Bus -> Sink)
+            spin_reserve_down = solph.components.Sink(
+                label="spin_reserve_down_service",
+                inputs={
+                    self.components['bus_electricity']: solph.Flow(
+                        nominal_value=spin_reserve_config.get('max_capacity_mw', total_power_capacity * 0.5),
+                        variable_costs=self._apply_objective_weights(
+                            self._apply_objective_config_to_flow(spin_reserve_config.get('down_price_yuan_mw', 50), is_revenue=True),
+                            'ancillary'
+                        )
+                    )
+                }
+            )
+            storage_components.extend([spin_reserve_up, spin_reserve_down])
+            print(f"已在模型中添加旋转备用辅助服务组件: {spin_reserve_config.get('max_capacity_mw')} MW")
         
         self.components['energy_storage'] = storage_components
     
@@ -624,7 +681,7 @@ class OptimizedVPPModel(VPPOptimizationModel):
         
         self.energy_system.add(*all_components)
         
-        print(f"✓ {self.mode.value} 模式能源系统创建完成，包含 {len(all_components)} 个组件")
+        print(f"[OK] {self.mode.value} 模式能源系统创建完成，包含 {len(all_components)} 个组件")
         return self.energy_system
     
     def _adjust_renewable_data(self, data: pd.Series, resource_type: str) -> pd.Series:
@@ -723,7 +780,7 @@ if __name__ == "__main__":
     
     if model.validate_system():
         summary = model.get_mode_summary()
-        print("\n📊 系统概要:")
+        print("\n[SUMMARY] 系统概要:")
         for key, value in summary.items():
             if key != 'components_by_type':
                 print(f"  {key}: {value}")

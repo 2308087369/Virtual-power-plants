@@ -97,12 +97,12 @@ python tests/run_tests.py --type objectives   # 优化目标测试
 - **冷机系统**: 20MW额定功率，30%-100%调节范围
 - **热机系统**: 15MW额定功率，20%-100%调节范围
 
-## 🎯 优化目标
+## 优化目标
 
 1. **成本最小化**: 最小化总运行成本
 2. **利润最大化**: 最大化总利润（售电收入+辅助服务收入-所有成本）
 
-## 📁 输出结构
+## 输出结构
 
 结果保存在 `outputs/{mode}_{objective}_{timestamp}/`:
 - `optimization_results.csv`: 详细调度结果
@@ -111,7 +111,7 @@ python tests/run_tests.py --type objectives   # 优化目标测试
 - `summary_report.txt`: 运行总结报告
 - `optimization_results.png`: 可视化图表
 
-## 🏗️ 系统架构
+## 系统架构
 
 ```
 vpp_opt_test_qqder/
@@ -126,7 +126,7 @@ vpp_opt_test_qqder/
 └── outputs/                    # 结果输出
 ```
 
-## 🔍 关键技术亮点
+## 关键技术亮点
 
 **分离式储能建模**: 通过Converter + GenericStorage架构解决传统GenericStorage约束失效问题，确保：
 - 零同时充放电时段
@@ -134,7 +134,7 @@ vpp_opt_test_qqder/
 - 物理约束合规性
 - 调度结果可执行性
 
-## 📈 典型运行结果
+## 典型运行结果
 
 基于24小时优化调度：
 - **可再生能源渗透率**: 49.1%
@@ -142,7 +142,7 @@ vpp_opt_test_qqder/
 - **最优模式**: renewable_storage（最具盈利性）
 - **储能套利**: 有效的削峰填谷
 
-## 🛠️ 技术栈
+## 技术栈
 
 - **优化引擎**: oemof-solph 0.6.0 + CBC求解器
 - **建模工具**: pyomo 6.6.0+
@@ -151,7 +151,7 @@ vpp_opt_test_qqder/
 - **配置管理**: PyYAML
 - **Python版本**: 3.12+
 
-## 📄 许可证
+## 许可证
 
 MIT License - 详见 [LICENSE](LICENSE) 文件
 ### 示例

@@ -35,7 +35,7 @@ def test_adjustable_loads():
         print("\n1. 生成数据...")
         gen = VPPDataGenerator()
         load_data, pv_data, wind_data, price_data = gen.generate_all_data()
-        print("✓ 数据生成成功")
+        print("[OK] 数据生成成功")
         
         # 2. 创建包含可调负荷的模型
         print("\n2. 创建优化模型（包含可调负荷）...")
@@ -49,34 +49,34 @@ def test_adjustable_loads():
                 adjustable_loads_found.append(node.label)
         
         if adjustable_loads_found:
-            print(f"✓ 找到可调负荷组件: {', '.join(adjustable_loads_found)}")
+            print(f"[OK] 找到可调负荷组件: {', '.join(adjustable_loads_found)}")
         else:
-            print("⚠ 未找到可调负荷组件")
+            print("[WARNING] 未找到可调负荷组件")
         
-        print("✓ 能源系统创建成功")
+        print("[OK] 能源系统创建成功")
         
         # 3. 求解优化问题
         print("\n3. 求解优化问题...")
         
         # 创建优化模型
         opt_model = solph.Model(energy_system)
-        print("✓ 优化模型创建成功")
+        print("[OK] 优化模型创建成功")
         
         # 设置CBC路径并求解
         cbc_path = os.path.join(os.getcwd(), 'cbc', 'bin', 'cbc.exe')
         solver = SolverFactory('cbc', executable=cbc_path)
         
         if not solver.available():
-            print("❌ CBC求解器不可用")
+            print("[FAIL] CBC求解器不可用")
             return False
         
-        print("✓ CBC求解器可用，开始求解...")
+        print("[OK] CBC求解器可用，开始求解...")
         
         # 求解
         results = solver.solve(opt_model, tee=False)
         
         if str(results.solver.termination_condition).lower() in ['optimal', 'feasible']:
-            print("✓ 优化求解成功")
+            print("[OK] 优化求解成功")
             
             # 提取oemof结果
             optimization_results = processing.results(opt_model)
@@ -96,11 +96,11 @@ def test_adjustable_loads():
                 adjustable_load_results['热机负荷'] = results_df['heat_pump_load_mw'].sum()
             
             if adjustable_load_results:
-                print("✓ 可调负荷结果分析:")
+                print("[OK] 可调负荷结果分析:")
                 for load_type, consumption in adjustable_load_results.items():
                     print(f"  - {load_type}: {consumption:.2f} MWh")
             else:
-                print("⚠ 未检测到可调负荷运行数据")
+                print("[WARNING] 未检测到可调负荷运行数据")
             
             # 检查经济性分析是否包含可调负荷成本
             adjustable_costs = {}
@@ -112,11 +112,11 @@ def test_adjustable_loads():
                 adjustable_costs['可调负荷总成本'] = economics['adjustable_loads_cost_yuan']
             
             if adjustable_costs:
-                print("✓ 可调负荷成本分析:")
+                print("[OK] 可调负荷成本分析:")
                 for cost_type, cost in adjustable_costs.items():
                     print(f"  - {cost_type}: {cost:,.2f} 元")
             else:
-                print("⚠ 未检测到可调负荷成本数据")
+                print("[WARNING] 未检测到可调负荷成本数据")
             
             # 检查技术指标是否包含可调负荷指标
             adjustable_metrics = {}
@@ -128,14 +128,14 @@ def test_adjustable_loads():
                 adjustable_metrics['可调负荷参与率'] = technical_metrics['adjustable_load_ratio']
             
             if adjustable_metrics:
-                print("✓ 可调负荷技术指标:")
+                print("[OK] 可调负荷技术指标:")
                 for metric_type, value in adjustable_metrics.items():
                     if '参与率' in metric_type:
                         print(f"  - {metric_type}: {value:.1%}")
                     else:
                         print(f"  - {metric_type}: {value:.2f} MWh")
             else:
-                print("⚠ 未检测到可调负荷技术指标")
+                print("[WARNING] 未检测到可调负荷技术指标")
             
             # 5. 生成可视化
             print("\n5. 生成可视化图表...")
@@ -143,7 +143,7 @@ def test_adjustable_loads():
             plot_file = plot_generator.generate_all_plots(
                 results_df, economics, price_data, "outputs/plots"
             )
-            print(f"✓ 可视化图表已生成: {plot_file}")
+            print(f"[OK] 可视化图表已生成: {plot_file}")
             
             # 6. 生成汇总报告
             print("\n6. 生成汇总报告...")
@@ -151,14 +151,14 @@ def test_adjustable_loads():
             
             # 检查汇总报告是否包含可调负荷信息
             if '可调负荷' in summary_report:
-                print("✓ 汇总报告包含可调负荷信息")
+                print("[OK] 汇总报告包含可调负荷信息")
             else:
-                print("⚠ 汇总报告中未发现可调负荷信息")
+                print("[WARNING] 汇总报告中未发现可调负荷信息")
             
-            print("\n🎉 可调负荷功能测试成功！")
+            print("\n[SUCCESS] 可调负荷功能测试成功！")
             
             # 打印关键指标对比
-            print("\n📊 系统关键指标:")
+            print("\n[METRICS] 系统关键指标:")
             print(f"  - 总负荷需求: {technical_metrics['load_total_mwh']:.1f} MWh")
             print(f"  - 可调负荷总量: {technical_metrics.get('total_adjustable_loads_mwh', 0):.1f} MWh")
             print(f"  - 可调负荷参与率: {technical_metrics.get('adjustable_load_ratio', 0):.1%}")
@@ -167,11 +167,11 @@ def test_adjustable_loads():
             return True
             
         else:
-            print(f"❌ 求解失败，状态: {results.solver.termination_condition}")
+            print(f"[FAIL] 求解失败，状态: {results.solver.termination_condition}")
             return False
             
     except Exception as e:
-        print(f"❌ 测试过程中出现错误: {e}")
+        print(f"[FAIL] 测试过程中出现错误: {e}")
         import traceback
         traceback.print_exc()
         return False
@@ -181,12 +181,12 @@ if __name__ == "__main__":
     success = test_adjustable_loads()
     
     if success:
-        print("\n✅ 可调负荷功能测试通过！")
-        print("\n📝 功能确认:")
-        print("  ✓ 冷机和热机模型创建成功")
-        print("  ✓ 可调负荷参与优化调度")
-        print("  ✓ 结果分析包含可调负荷数据")
-        print("  ✓ 可视化图表显示可调负荷")
-        print("  ✓ 汇总报告包含可调负荷分析")
+        print("\n[OK] 可调负荷功能测试通过！")
+        print("\n[CHECK] 功能确认:")
+        print("  - 冷机和热机模型创建成功")
+        print("  - 可调负荷参与优化调度")
+        print("  - 结果分析包含可调负荷数据")
+        print("  - 可视化图表显示可调负荷")
+        print("  - 汇总报告包含可调负荷分析")
     else:
-        print("\n❌ 可调负荷功能测试失败，请检查配置和实现")
+        print("\n[FAIL] 可调负荷功能测试失败，请检查配置和实现")

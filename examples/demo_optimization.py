@@ -20,36 +20,36 @@ from src.solvers.optimization_solver import OptimizationSolver
 
 def simple_demo():
     """简单演示"""
-    print("🚀 虚拟电厂优化演示")
+    print("[DEMO] 虚拟电厂优化演示")
     print("="*50)
     
     try:
         # 1. 生成数据
-        print("📊 生成示例数据...")
+        print("[DATA] 生成示例数据...")
         generator = VPPDataGenerator()
         load_data, pv_data, wind_data, price_data = generator.generate_all_data()
         
         # 2. 创建模型
-        print("\n🔧 构建优化模型...")
+        print("\n[MODEL] 构建优化模型...")
         model = VPPOptimizationModel(generator.time_index)
         energy_system = model.create_energy_system(load_data, pv_data, wind_data, price_data)
         
         # 3. 求解
-        print("\n⚡ 执行优化求解...")
+        print("\n[SOLVE] 执行优化求解...")
         solver = OptimizationSolver()
         success = solver.solve(energy_system)
         
         if success:
-            print("✅ 优化成功完成！")
+            print("[OK] 优化成功完成！")
             stats = solver.get_solve_statistics()
             print(f"求解时间: {stats.get('solve_time_seconds', 0):.2f} 秒")
         else:
-            print("❌ 优化失败")
+            print("[FAIL] 优化失败")
         
         return success
         
     except Exception as e:
-        print(f"❌ 演示过程出错: {e}")
+        print(f"[ERROR] 演示过程出错: {e}")
         return False
 
 

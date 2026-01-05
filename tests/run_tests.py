@@ -31,7 +31,7 @@ def print_header():
 
 def run_basic_tests():
     """运行基础功能测试"""
-    print("\n🔧 基础功能测试")
+    print("\n[TEST] 基础功能测试")
     print("-" * 50)
     
     try:
@@ -39,13 +39,13 @@ def run_basic_tests():
         success = run_tests()
         return success
     except Exception as e:
-        print(f"❌ 基础功能测试失败: {e}")
+        print(f"[FAIL] 基础功能测试失败: {e}")
         return False
 
 
 def run_scheduling_modes_tests():
     """运行调度模式测试"""
-    print("\n🎛️ 调度模式测试")
+    print("\n[TEST] 调度模式测试")
     print("-" * 50)
     
     try:
@@ -53,13 +53,13 @@ def run_scheduling_modes_tests():
         success = run_comprehensive_test()
         return success
     except Exception as e:
-        print(f"❌ 调度模式测试失败: {e}")
+        print(f"[FAIL] 调度模式测试失败: {e}")
         return False
 
 
 def run_optimization_objectives_tests():
     """运行优化目标测试"""
-    print("\n🎯 优化目标测试")
+    print("\n[TEST] 优化目标测试")
     print("-" * 50)
     
     try:
@@ -67,13 +67,13 @@ def run_optimization_objectives_tests():
         run_comparison_demo()
         return True
     except Exception as e:
-        print(f"❌ 优化目标测试失败: {e}")
+        print(f"[FAIL] 优化目标测试失败: {e}")
         return False
 
 
 def run_adjustable_loads_tests():
     """运行可调负荷测试"""
-    print("\n⚡ 可调负荷测试")
+    print("\n[TEST] 可调负荷测试")
     print("-" * 50)
     
     try:
@@ -81,13 +81,13 @@ def run_adjustable_loads_tests():
         success = test_adjustable_loads()
         return success
     except Exception as e:
-        print(f"❌ 可调负荷测试失败: {e}")
+        print(f"[FAIL] 可调负荷测试失败: {e}")
         return False
 
 
 def run_ancillary_services_tests():
     """运行辅助服务测试"""
-    print("\n🔋 辅助服务测试")
+    print("\n[TEST] 辅助服务测试")
     print("-" * 50)
     
     try:
@@ -95,13 +95,13 @@ def run_ancillary_services_tests():
         success = test_ancillary_services()
         return success
     except Exception as e:
-        print(f"❌ 辅助服务测试失败: {e}")
+        print(f"[FAIL] 辅助服务测试失败: {e}")
         return False
 
 
 def run_cbc_tests():
     """运行CBC求解器测试"""
-    print("\n🔨 CBC求解器测试")
+    print("\n[TEST] CBC求解器测试")
     print("-" * 50)
     
     try:
@@ -118,13 +118,13 @@ def run_cbc_tests():
         
         return result.returncode == 0
     except Exception as e:
-        print(f"❌ CBC求解器测试失败: {e}")
+        print(f"[FAIL] CBC求解器测试失败: {e}")
         return False
 
 
 def run_complete_flow_tests():
     """运行完整流程测试"""
-    print("\n🔄 完整流程测试")
+    print("\n[TEST] 完整流程测试")
     print("-" * 50)
     
     try:
@@ -132,7 +132,7 @@ def run_complete_flow_tests():
         success = test_complete_flow()
         return success
     except Exception as e:
-        print(f"❌ 完整流程测试失败: {e}")
+        print(f"[FAIL] 完整流程测试失败: {e}")
         return False
 
 
@@ -159,7 +159,7 @@ def run_all_tests():
             success = test_func()
             test_results[test_name] = success
         except Exception as e:
-            print(f"❌ {test_name}测试执行异常: {e}")
+            print(f"[FAIL] {test_name}测试执行异常: {e}")
             test_results[test_name] = False
     
     # 打印测试结果总结
@@ -185,11 +185,11 @@ def print_test_summary(test_results):
         print(f"{test_name:<15} {status}")
     
     overall_success = all(test_results.values())
-    print(f"\n🎯 整体测试状态: {'✅ 全部通过' if overall_success else '❌ 部分失败'}")
+    print(f"\n[RESULT] 整体测试状态: {'[OK] 全部通过' if overall_success else '[FAIL] 部分失败'}")
     print(f"📅 测试完成时间: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     
     if not overall_success:
-        print("\n💡 建议:")
+        print("\n[SUGGESTION] 建议:")
         print("1. 检查失败的测试模块的错误信息")
         print("2. 确认依赖包安装正确")
         print("3. 检查CBC求解器路径配置")

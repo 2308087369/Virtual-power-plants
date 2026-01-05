@@ -7,6 +7,7 @@ VPP Optimization Model
 
 import os
 import yaml
+import logging
 import pandas as pd
 import numpy as np
 from typing import Dict, Optional, Tuple
@@ -15,19 +16,34 @@ warnings.filterwarnings('ignore')
 
 # oemof-solph 核心导入
 import oemof.solph as solph
-from oemof.tools import logger
+import oemof.tools.logger as oemof_logger
+
+# 获取模块级日志记录器
+logger = logging.getLogger(__name__)
 
 
 class VPPOptimizationModel:
-    """虚拟电厂优化模型"""
+    """
+    虚拟电厂优化模型 (Virtual Power Plant Optimization Model)
+    
+    该类基于 oemof-solph 框架构建，用于模拟和优化虚拟电厂内的各种能源资源、
+    负荷和储能系统的运行。支持多种调度模式和辅助服务（调频、旋转备用）。
+    
+    Attributes:
+        time_index (pd.DatetimeIndex): 优化的时间索引
+        periods (int): 优化时间段数量
+        config (Dict): 系统配置字典
+        energy_system (solph.EnergySystem): 构建的 oemof 能源系统对象
+        components (Dict): 存储系统各组件的字典，便于后续引用
+    """
     
     def __init__(self, time_index: pd.DatetimeIndex, config_path: Optional[str] = None):
         """
         初始化优化模型
         
         Args:
-            time_index: 时间索引
-            config_path: 配置文件路径
+            time_index: 时间索引，定义了优化的时间跨度和频率
+            config_path: 配置文件路径，如果不提供则使用默认路径
         """
         self.time_index = time_index
         self.periods = len(time_index)
@@ -39,24 +55,76 @@ class VPPOptimizationModel:
         
         # 配置日志
         self._setup_logging()
-        
+    
     def _load_config(self, config_path: Optional[str]) -> Dict:
-        """加载配置文件"""
+        """
+        加载配置文件并与默认配置合并。
+        
+        采用递归合并策略，确保即使配置文件不完整，关键配置项也能通过默认值填充。
+        
+        Args:
+            config_path: 配置文件路径
+            
+        Returns:
+            合并后的配置字典
+        """
+        default_config = self._get_default_config()
+        
         if config_path is None:
             config_path = os.path.join(
                 os.path.dirname(os.path.dirname(os.path.dirname(__file__))),
                 'config', 'system_config.yaml'
             )
         
+        if not os.path.exists(config_path):
+            logger.warning(f"配置文件不存在: {config_path}，将完全使用默认配置")
+            return default_config
+            
         try:
             with open(config_path, 'r', encoding='utf-8') as f:
-                return yaml.safe_load(f)
+                user_config = yaml.safe_load(f)
+            
+            if user_config is None:
+                logger.warning(f"配置文件为空: {config_path}，将使用默认配置")
+                return default_config
+                
+            # 递归合并配置，确保所有必需的键都存在
+            return self._merge_configs(default_config, user_config)
         except Exception as e:
-            print(f"加载配置失败: {e}，使用默认配置")
-            return self._get_default_config()
+            logger.error(f"加载配置失败: {e}，将使用默认配置")
+            return default_config
+    
+    def _merge_configs(self, default: Dict, user: Dict) -> Dict:
+        """
+        递归合并两个字典配置。
+        
+        Args:
+            default: 默认配置字典
+            user: 用户提供的配置字典
+            
+        Returns:
+            合并后的字典
+        """
+        if user is None:
+            return default
+            
+        merged = default.copy()
+        for key, value in user.items():
+            if key in merged and isinstance(merged[key], dict) and isinstance(value, dict):
+                merged[key] = self._merge_configs(merged[key], value)
+            else:
+                merged[key] = value
+        return merged
     
     def _get_default_config(self) -> Dict:
-        """获取默认配置"""
+        """
+        获取系统默认配置。
+        
+        包含光伏、风电、燃气轮机、储能系统、可调负荷和电网连接的基本参数。
+        
+        Returns:
+            默认配置字典
+        """
         return {
             'energy_resources': {
                 'photovoltaic': {
@@ -107,9 +175,11 @@ class VPPOptimizationModel:
         }
     
     def _setup_logging(self):
-        """设置日志配置"""
-        import logging
+        """
+        设置日志配置。
         
+        整合 oemof 的日志系统和标准 Python 日志。
+        """
         # 设置根日志级别为INFO，避免DEBUG级别导致的性能问题
         logging.getLogger().setLevel(logging.INFO)
         
@@ -119,28 +189,37 @@ class VPPOptimizationModel:
         )
         os.makedirs(log_dir, exist_ok=True)
         
-        logger.define_logging(
+        oemof_logger.define_logging(
             logpath=log_dir,
             logfile='vpp_optimization.log',
-            screen_level=30,  # WARNING及以上
-            file_level=20     # INFO及以上
+            screen_level=logging.WARNING,  # 屏幕显示 WARNING 及以上
+            file_level=logging.INFO        # 文件保存 INFO 及以上
         )
     
     def create_energy_system(self, load_data: pd.Series, pv_data: pd.Series, 
                            wind_data: pd.Series, price_data: pd.Series) -> solph.EnergySystem:
         """
-        创建能源系统模型
+        创建并构建能源系统模型。
+        
+        按顺序执行以下步骤：
+        1. 创建电力总线
+        2. 添加负荷需求
+        3. 添加可再生能源 (PV, Wind)
+        4. 添加常规机组 (Gas Turbine)
+        5. 添加储能系统 (Battery) 及辅助服务组件
+        6. 添加可调负荷 (Chiller, Heat Pump)
+        7. 添加电网连接
         
         Args:
-            load_data: 负荷需求数据
-            pv_data: 光伏发电数据
-            wind_data: 风电发电数据
-            price_data: 电价数据
+            load_data: 负荷需求时间序列 (MW)
+            pv_data: 光伏发电出力序列 (MW)
+            wind_data: 风电发电出力序列 (MW)
+            price_data: 电价时间序列 (元/MWh)
             
         Returns:
-            构建完成的能源系统
+            构建完成的 solph.EnergySystem 对象
         """
-        print("正在创建虚拟电厂能源系统模型...")
+        logger.info("正在创建虚拟电厂能源系统模型...")
         
         # 创建能源系统
         self.energy_system = solph.EnergySystem(
@@ -167,7 +246,7 @@ class VPPOptimizationModel:
         
         self.energy_system.add(*all_components)
         
-        print(f"能源系统创建完成，包含 {len(all_components)} 个组件")
+        logger.info(f"能源系统创建完成，包含 {len(all_components)} 个组件")
         return self.energy_system
     
     def _create_buses(self):
@@ -273,12 +352,10 @@ class VPPOptimizationModel:
         freq_reg_config = ancillary_config.get('frequency_regulation', {})
         spin_reserve_config = ancillary_config.get('spinning_reserve', {})
         
-        # 简化储能建模：暂时禁用辅助服务以解决约束冲突
-        # TODO: 未来需要重新设计辅助服务与储能的耦合约束
+        # 储能基本配置
         total_power_capacity = battery_config['power_capacity_mw']
-        available_power_capacity = total_power_capacity
         
-        print(f"储能配置 - 功率容量: {total_power_capacity} MW, 能量容量: {battery_config['energy_capacity_mwh']} MWh")
+        logger.info(f"储能配置 - 功率容量: {total_power_capacity} MW, 能量容量: {battery_config['energy_capacity_mwh']} MWh")
         
         # 计算综合充电成本（包含循环损耗）
         base_charge_cost = battery_config['charge_cost_yuan_mwh']
@@ -290,39 +367,81 @@ class VPPOptimizationModel:
             label="battery_storage",
             inputs={
                 self.components['bus_electricity']: solph.Flow(
-                    nominal_value=available_power_capacity,
+                    nominal_value=total_power_capacity,
                     variable_costs=total_charge_cost,
-                    max=1.0,  # 强制最大功率约束
-                    min=0.0   # 强制最小功率约束
+                    max=1.0,
+                    min=0.0
                 )
             },
             outputs={
                 self.components['bus_electricity']: solph.Flow(
-                    nominal_value=available_power_capacity,
+                    nominal_value=total_power_capacity,
                     variable_costs=battery_config['discharge_cost_yuan_mwh'],
-                    max=1.0,  # 强制最大功率约束
-                    min=0.0   # 强制最小功率约束
+                    max=1.0,
+                    min=0.0
                 )
             },
             nominal_storage_capacity=battery_config['energy_capacity_mwh'],
             initial_storage_level=battery_config['initial_soc'],
-            min_storage_level=battery_config.get('min_soc', 0.1),  # 更保守的最小SOC
-            max_storage_level=battery_config.get('max_soc', 0.95),  # 更高的最大SOC
+            min_storage_level=battery_config.get('min_soc', 0.1),
+            max_storage_level=battery_config.get('max_soc', 0.95),
             inflow_conversion_factor=battery_config['charge_efficiency'],
             outflow_conversion_factor=battery_config['discharge_efficiency'],
             loss_rate=battery_config['self_discharge_rate'],
-            balanced=True  # 确保储能期初期末状态相等
+            balanced=True
         )
-        
-        print(f"设置储能约束 - 充电功率: 0-{available_power_capacity} MW, 放电功率: 0-{available_power_capacity} MW")
         
         storage_components = [battery_storage]
         
-        # 暂时禁用辅助服务组件以解决储能约束冲突问题
-        # 辅助服务组件作为独立组件会绕过储能的SOC和容量约束
-        # TODO: 未来需要实现辅助服务与储能的正确耦合约束
-        print("注意：为解决储能约束问题，暂时禁用辅助服务组件")
-        
+        # 创建辅助服务组件
+        if freq_reg_config.get('enable', False):
+            # 向上调频服务 (Source -> Bus)
+            freq_reg_up = solph.components.Source(
+                label="freq_reg_up_service",
+                outputs={
+                    self.components['bus_electricity']: solph.Flow(
+                        nominal_value=freq_reg_config.get('max_capacity_mw', total_power_capacity * 0.5),
+                        variable_costs=0  # 收入在分析器中计算，此处设为0或负值表示收入
+                    )
+                }
+            )
+            # 向下调频服务 (Bus -> Sink)
+            freq_reg_down = solph.components.Sink(
+                label="freq_reg_down_service",
+                inputs={
+                    self.components['bus_electricity']: solph.Flow(
+                        nominal_value=freq_reg_config.get('max_capacity_mw', total_power_capacity * 0.5),
+                        variable_costs=0
+                    )
+                }
+            )
+            storage_components.extend([freq_reg_up, freq_reg_down])
+            logger.info(f"已启用调频辅助服务: 最大容量 {freq_reg_config.get('max_capacity_mw')} MW")
+            
+        if spin_reserve_config.get('enable', False):
+            # 向上旋转备用 (Source -> Bus)
+            spin_reserve_up = solph.components.Source(
+                label="spin_reserve_up_service",
+                outputs={
+                    self.components['bus_electricity']: solph.Flow(
+                        nominal_value=spin_reserve_config.get('max_capacity_mw', total_power_capacity * 0.5),
+                        variable_costs=0
+                    )
+                }
+            )
+            # 向下旋转备用 (Bus -> Sink)
+            spin_reserve_down = solph.components.Sink(
+                label="spin_reserve_down_service",
+                inputs={
+                    self.components['bus_electricity']: solph.Flow(
+                        nominal_value=spin_reserve_config.get('max_capacity_mw', total_power_capacity * 0.5),
+                        variable_costs=0
+                    )
+                }
+            )
+            storage_components.extend([spin_reserve_up, spin_reserve_down])
+            logger.info(f"已启用旋转备用辅助服务: 最大容量 {spin_reserve_config.get('max_capacity_mw')} MW")
+            
         self.components['energy_storage'] = storage_components
     
     def _create_adjustable_loads(self):
@@ -396,6 +515,138 @@ class VPPOptimizationModel:
         
         self.components['grid_connection'] = [grid_source, grid_sink]
     
+    def add_ancillary_service_constraints(self, model: solph.Model):
+        """
+        向优化模型添加辅助服务耦合约束
+        
+        包含：
+        1. 功率耦合约束：储能放电/充电功率与辅助服务容量之和不得超过最大功率
+        2. 能量耦合约束：储能当前电量必须足以支撑所提供的向上/向下辅助服务
+        
+        该方法利用 Pyomo 的约束机制，在 oemof-solph 构建的底层模型上添加
+        跨组件的耦合约束，确保辅助服务的调用符合储能系统的物理限制。
+        
+        Args:
+            model: 已构建的 oemof.solph.Model 对象
+        """
+        from pyomo import environ as pyo
+        
+        # 获取相关组件
+        battery_storage = None
+        freq_reg_up = None
+        freq_reg_down = None
+        spin_reserve_up = None
+        spin_reserve_down = None
+        
+        # 从能源系统中查找组件
+        # oemof 将所有组件存储在 energy_system.nodes 中
+        battery_tank = None
+        battery_charger = None
+        battery_discharger = None
+
+        for node in self.energy_system.nodes:
+            if node.label == "battery_storage":
+                battery_storage = node
+            elif node.label == "battery_tank":
+                battery_tank = node
+            elif node.label == "battery_charger":
+                battery_charger = node
+            elif node.label == "battery_discharger":
+                battery_discharger = node
+            elif node.label == "freq_reg_up_service":
+                freq_reg_up = node
+            elif node.label == "freq_reg_down_service":
+                freq_reg_down = node
+            elif node.label == "spin_reserve_up_service":
+                spin_reserve_up = node
+            elif node.label == "spin_reserve_down_service":
+                spin_reserve_down = node
+                
+        if not battery_storage and not battery_tank:
+            logger.warning("未找到储能组件（battery_storage 或 battery_tank），跳过辅助服务约束添加")
+            return
+
+        # 获取储能参数，用于约束计算
+        battery_config = self.config['energy_resources']['battery_storage']
+        p_max = battery_config['power_capacity_mw']
+        e_max = battery_config['energy_capacity_mwh']
+        e_min = battery_config.get('min_soc', 0.1) * e_max
+        
+        # 获取时间步长（小时），用于电量预留计算
+        if len(self.time_index) > 1:
+            time_delta = self.time_index[1] - self.time_index[0]
+            dt = time_delta.total_seconds() / 3600.0
+        else:
+            dt = 1.0  # 默认1小时
+            
+        # 1. 功率限制约束 (Power Limit Constraints)
+        # 确保能量调度与辅助服务调度的总功率不超过设备额定功率
+        def storage_power_up_limit_rule(m, t):
+            # 向上功率约束：放电功率 + 向上调频 + 向上旋转备用 <= 最大功率
+            if battery_storage:
+                p_discharge = m.flow[battery_storage, self.components['bus_electricity'], t]
+            else:
+                p_discharge = m.flow[battery_discharger, self.components['bus_electricity'], t]
+
+            r_up = 0
+            if freq_reg_up:
+                r_up += m.flow[freq_reg_up, self.components['bus_electricity'], t]
+            if spin_reserve_up:
+                r_up += m.flow[spin_reserve_up, self.components['bus_electricity'], t]
+            
+            return p_discharge + r_up <= p_max
+
+        def storage_power_down_limit_rule(m, t):
+            # 向下功率约束：充电功率 + 向下调频 + 向下旋转备用 <= 最大功率
+            if battery_storage:
+                p_charge = m.flow[self.components['bus_electricity'], battery_storage, t]
+            else:
+                p_charge = m.flow[self.components['bus_electricity'], battery_charger, t]
+
+            r_down = 0
+            if freq_reg_down:
+                r_down += m.flow[self.components['bus_electricity'], freq_reg_down, t]
+            if spin_reserve_down:
+                r_down += m.flow[self.components['bus_electricity'], spin_reserve_down, t]
+            
+            return p_charge + r_down <= p_max
+
+        # 2. 能量预留约束 (Energy Reserve Constraints)
+        # 确保储能电量足以支撑辅助服务的调用
+        def storage_energy_up_reserve_rule(m, t):
+            # 向上能量约束：当前电量 - 向上服务所需能量 >= 最小电量
+            target_storage = battery_storage if battery_storage else battery_tank
+            e_current = m.GenericStorageBlock.storage_content[target_storage, t]
+            
+            r_up_energy = 0
+            if freq_reg_up:
+                r_up_energy += m.flow[freq_reg_up, self.components['bus_electricity'], t] * dt
+            if spin_reserve_up:
+                r_up_energy += m.flow[spin_reserve_up, self.components['bus_electricity'], t] * dt
+            
+            return e_current - r_up_energy >= e_min
+
+        def storage_energy_down_reserve_rule(m, t):
+            # 向下能量约束：当前电量 + 向下服务所需能量 <= 最大电量
+            target_storage = battery_storage if battery_storage else battery_tank
+            e_current = m.GenericStorageBlock.storage_content[target_storage, t]
+            
+            r_down_energy = 0
+            if freq_reg_down:
+                r_down_energy += m.flow[self.components['bus_electricity'], freq_reg_down, t] * dt
+            if spin_reserve_down:
+                r_down_energy += m.flow[self.components['bus_electricity'], spin_reserve_down, t] * dt
+            
+            return e_current + r_down_energy <= e_max
+
+        # 将定义好的规则添加到 Pyomo 模型中
+        model.storage_power_up_limit = pyo.Constraint(model.TIMESTEPS, rule=storage_power_up_limit_rule)
+        model.storage_power_down_limit = pyo.Constraint(model.TIMESTEPS, rule=storage_power_down_limit_rule)
+        model.storage_energy_up_reserve = pyo.Constraint(model.TIMESTEPS, rule=storage_energy_up_reserve_rule)
+        model.storage_energy_down_reserve = pyo.Constraint(model.TIMESTEPS, rule=storage_energy_down_reserve_rule)
+        
+        logger.info("已成功添加辅助服务功率与能量耦合约束")
+
     def get_component_by_label(self, label: str):
         """根据标签获取组件"""
         for component in self.energy_system.nodes:
@@ -406,21 +657,21 @@ class VPPOptimizationModel:
     def validate_system(self) -> bool:
         """验证能源系统的完整性"""
         if self.energy_system is None:
-            print("错误：能源系统未创建")
+            logger.error("错误：能源系统未创建")
             return False
         
         # 检查是否有组件
         if len(self.energy_system.nodes) == 0:
-            print("错误：能源系统中没有组件")
+            logger.error("错误：能源系统中没有组件")
             return False
         
         # 检查电力总线是否存在
         bus_electricity = self.get_component_by_label("bus_electricity")
         if bus_electricity is None:
-            print("错误：缺少电力总线")
+            logger.error("错误：缺少电力总线")
             return False
         
-        print("能源系统验证通过")
+        logger.info("能源系统验证通过")
         return True
     
     def get_system_summary(self) -> Dict:

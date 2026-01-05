@@ -65,7 +65,7 @@ python tests/run_tests.py --type scheduling   # Scheduling modes
 python tests/run_tests.py --type objectives   # Optimization objectives
 ```
 
-## 🔧 Configuration
+## Configuration
 
 Edit configuration files to customize system parameters:
 
@@ -78,7 +78,7 @@ Edit configuration files to customize system parameters:
 **Solver Configuration** (`config/solver_config.yaml`):
 - CBC solver settings (threads, time limits, gaps)
 
-## 📊 System Components
+## System Components
 
 ### Generation Resources
 - **PV**: 50MW capacity, 5 yuan/MWh cost

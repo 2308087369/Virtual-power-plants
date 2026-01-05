@@ -43,7 +43,7 @@ class TestVPPSchedulingModes(unittest.TestCase):
     
     def test_mode_manager_initialization(self):
         """测试调度模式管理器初始化"""
-        print(f"\n🔧 测试调度模式管理器初始化...")
+        print(f"\n[SETUP] 测试调度模式管理器初始化...")
         
         # 测试管理器创建
         self.assertIsNotNone(self.manager)
@@ -52,11 +52,11 @@ class TestVPPSchedulingModes(unittest.TestCase):
         # 测试模式配置初始化
         self.assertEqual(len(self.manager.mode_configs), len(SchedulingMode))
         
-        print("✓ 调度模式管理器初始化成功")
+        print("[OK] 调度模式管理器初始化成功")
     
     def test_available_modes_listing(self):
         """测试可用模式列表"""
-        print(f"\n📋 测试可用模式列表...")
+        print(f"\n[LIST] 测试可用模式列表...")
         
         available_modes = self.manager.list_available_modes()
         
@@ -66,69 +66,69 @@ class TestVPPSchedulingModes(unittest.TestCase):
         
         # 打印所有可用模式
         for mode, description in available_modes:
-            print(f"  • {mode.value}: {description}")
+            print(f"  - {mode.value}: {description}")
         
-        print(f"✓ 共发现 {len(available_modes)} 个调度模式")
+        print(f"[OK] 共发现 {len(available_modes)} 个调度模式")
     
     def test_renewable_storage_mode(self):
         """测试可再生能源+储能模式"""
-        print(f"\n🌞 测试可再生能源+储能模式...")
+        print(f"\n[RENEWABLE] 测试可再生能源+储能模式...")
         
         mode = SchedulingMode.RENEWABLE_STORAGE
         success = self._test_single_mode(mode)
         
         self.assertTrue(success, f"{mode.value} 模式测试失败")
-        print(f"✓ {mode.value} 模式测试通过")
+        print(f"[OK] {mode.value} 模式测试通过")
     
     def test_adjustable_storage_mode(self):
         """测试可调负荷+储能模式"""
-        print(f"\n⚡ 测试可调负荷+储能模式...")
+        print(f"\n[ADJUSTABLE] 测试可调负荷+储能模式...")
         
         mode = SchedulingMode.ADJUSTABLE_STORAGE
         success = self._test_single_mode(mode)
         
         self.assertTrue(success, f"{mode.value} 模式测试失败")
-        print(f"✓ {mode.value} 模式测试通过")
+        print(f"[OK] {mode.value} 模式测试通过")
     
     def test_traditional_mode(self):
         """测试传统模式"""
-        print(f"\n🏭 测试传统模式...")
+        print(f"\n[TRADITIONAL] 测试传统模式...")
         
         mode = SchedulingMode.TRADITIONAL
         success = self._test_single_mode(mode)
         
         self.assertTrue(success, f"{mode.value} 模式测试失败")
-        print(f"✓ {mode.value} 模式测试通过")
+        print(f"[OK] {mode.value} 模式测试通过")
     
     def test_no_renewable_mode(self):
         """测试无可再生能源模式"""
-        print(f"\n🔋 测试无可再生能源模式...")
+        print(f"\n[STORAGE] 测试无可再生能源模式...")
         
         mode = SchedulingMode.NO_RENEWABLE
         success = self._test_single_mode(mode)
         
         self.assertTrue(success, f"{mode.value} 模式测试失败")
-        print(f"✓ {mode.value} 模式测试通过")
+        print(f"[OK] {mode.value} 模式测试通过")
     
     def test_storage_only_mode(self):
         """测试纯储能模式"""
-        print(f"\n🔋 测试纯储能模式...")
+        print(f"\n[STORAGE] 测试纯储能模式...")
         
         mode = SchedulingMode.STORAGE_ONLY
         success = self._test_single_mode(mode)
         
         self.assertTrue(success, f"{mode.value} 模式测试失败")
-        print(f"✓ {mode.value} 模式测试通过")
+        print(f"[OK] {mode.value} 模式测试通过")
     
     def test_full_system_mode(self):
         """测试完整系统模式"""
-        print(f"\n🌐 测试完整系统模式...")
+        print(f"\n[FULL] 测试完整系统模式...")
         
         mode = SchedulingMode.FULL_SYSTEM
         success = self._test_single_mode(mode)
         
         self.assertTrue(success, f"{mode.value} 模式测试失败")
-        print(f"✓ {mode.value} 模式测试通过")
+        print(f"[OK] {mode.value} 模式测试通过")
     
     def _test_single_mode(self, mode: SchedulingMode) -> bool:
         """测试单个调度模式"""
@@ -169,7 +169,7 @@ class TestVPPSchedulingModes(unittest.TestCase):
             return True
             
         except Exception as e:
-            print(f"    ❌ {mode.value} 模式测试失败: {str(e)}")
+            print(f"    [FAIL] {mode.value} 模式测试失败: {str(e)}")
             return False
     
     def _get_expected_resources(self, mode: SchedulingMode) -> Dict[str, bool]:
@@ -229,7 +229,7 @@ class TestVPPSchedulingModes(unittest.TestCase):
     
     def test_mode_descriptions(self):
         """测试模式描述功能"""
-        print(f"\n📝 测试模式描述功能...")
+        print(f"\n[DESC] 测试模式描述功能...")
         
         for mode in SchedulingMode:
             # 测试模式描述
@@ -242,11 +242,11 @@ class TestVPPSchedulingModes(unittest.TestCase):
             self.assertIsInstance(objective, str)
             self.assertGreater(len(objective), 0)
             
-            print(f"  • {mode.value}:")
+            print(f"  - {mode.value}:")
             print(f"    描述: {description}")
             print(f"    目标: {objective}")
         
-        print("✓ 所有模式描述测试通过")
+        print("[OK] 所有模式描述测试通过")
 
 
 class VPPSchedulingModesPerformanceTest:
@@ -267,7 +267,7 @@ class VPPSchedulingModesPerformanceTest:
         results = {}
         
         for mode in SchedulingMode:
-            print(f"\n🏃 测试 {mode.value} 模式性能...")
+            print(f"\n[RUN] 测试 {mode.value} 模式性能...")
             
             start_time = time.time()
             
@@ -294,15 +294,15 @@ class VPPSchedulingModesPerformanceTest:
                         'success': True
                     }
                     
-                    print(f"  ✓ 创建时间: {creation_time:.3f} 秒")
-                    print(f"  ✓ 组件数量: {summary.get('total_components', 0)}")
+                    print(f"  [OK] 创建时间: {creation_time:.3f} 秒")
+                    print(f"  [OK] 组件数量: {summary.get('total_components', 0)}")
                 else:
                     results[mode] = {'success': False}
-                    print(f"  ❌ 系统验证失败")
+                    print(f"  [FAIL] 系统验证失败")
                 
             except Exception as e:
                 results[mode] = {'success': False, 'error': str(e)}
-                print(f"  ❌ 测试失败: {str(e)}")
+                print(f"  [FAIL] 测试失败: {str(e)}")
         
         self._print_performance_summary(results)
         return results
@@ -318,18 +318,18 @@ class VPPSchedulingModesPerformanceTest:
         
         for mode, result in results.items():
             if result.get('success', False):
-                status = "✓ 成功"
+                status = "[OK] 成功"
                 creation_time = result.get('creation_time', 0)
                 components = result.get('components_count', 0)
                 print(f"{mode.value:<20} {status:<10} {creation_time:<11.3f} {components:<10}")
             else:
-                status = "❌ 失败"
+                status = "[FAIL] 失败"
                 print(f"{mode.value:<20} {status:<10} {'N/A':<12} {'N/A':<10}")
 
 
 def run_comprehensive_test():
     """运行综合测试"""
-    print("🚀 启动虚拟电厂调度模式综合测试...")
+    print("[TEST] 启动虚拟电厂调度模式综合测试...")
     
     # 单元测试
     print(f"\n{'='*80}")
@@ -367,10 +367,10 @@ def run_comprehensive_test():
     print(f"性能测试: {performance_success}/{performance_total} 通过")
     
     if failures == 0 and errors == 0 and performance_success == performance_total:
-        print("\n🎉 所有测试通过！虚拟电厂调度模式系统运行正常。")
+        print("\n[SUCCESS] 所有测试通过！虚拟电厂调度模式系统运行正常。")
         return True
     else:
-        print(f"\n❌ 部分测试失败。失败数: {failures}, 错误数: {errors}, 性能测试失败数: {performance_total - performance_success}")
+        print(f"\n[FAIL] 部分测试失败。失败数: {failures}, 错误数: {errors}, 性能测试失败数: {performance_total - performance_success}")
         return False
 
 
@@ -398,7 +398,7 @@ if __name__ == "__main__":
         tester.setUp()
         mode = SchedulingMode(args.mode)
         success = tester._test_single_mode(mode)
-        print(f"\n{'✓' if success else '❌'} {mode.value} 模式测试{'通过' if success else '失败'}")
+        print(f"\n{'[OK]' if success else '[FAIL]'} {mode.value} 模式测试{'通过' if success else '失败'}")
     else:
         # 运行综合测试
         run_comprehensive_test()

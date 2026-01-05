@@ -35,20 +35,20 @@ def test_complete_flow():
         print("\n1. 生成数据...")
         gen = VPPDataGenerator()
         load_data, pv_data, wind_data, price_data = gen.generate_all_data()
-        print("✓ 数据生成成功")
+        print("[OK] 数据生成成功")
         
         # 2. 创建模型
         print("\n2. 创建优化模型...")
         model = VPPOptimizationModel(gen.time_index)
         energy_system = model.create_energy_system(load_data, pv_data, wind_data, price_data)
-        print("✓ 能源系统创建成功")
+        print("[OK] 能源系统创建成功")
         
         # 3. 求解优化问题
         print("\n3. 求解优化问题...")
         
         # 创建优化模型
         opt_model = solph.Model(energy_system)
-        print("✓ 优化模型创建成功")
+        print("[OK] 优化模型创建成功")
         
         # 设置CBC路径
         cbc_path = os.path.join(project_root, 'cbc', 'bin', 'cbc.exe')
@@ -59,16 +59,16 @@ def test_complete_flow():
         solver = SolverFactory('cbc', executable=cbc_path)
         
         if not solver.available():
-            print("❌ CBC求解器不可用")
+            print("[FAIL] CBC求解器不可用")
             return False
         
-        print("✓ CBC求解器可用，开始求解...")
+        print("[OK] CBC求解器可用，开始求解...")
         
         # 求解
         results = solver.solve(opt_model, tee=True)
         
         if str(results.solver.termination_condition).lower() in ['optimal', 'feasible']:
-            print("✓ 优化求解成功")
+            print("[OK] 优化求解成功")
             
             # 提取oemof结果
             optimization_results = processing.results(opt_model)
@@ -82,7 +82,7 @@ def test_complete_flow():
             
             # 保存分析结果
             saved_files = analyzer.save_results("outputs")
-            print(f"✓ 结果分析完成，保存了 {len(saved_files)} 个文件")
+            print(f"[OK] 结果分析完成，保存了 {len(saved_files)} 个文件")
             for file_type, file_path in saved_files.items():
                 print(f"  - {file_type}: {file_path}")
             
@@ -92,7 +92,7 @@ def test_complete_flow():
             plot_file = plot_generator.generate_all_plots(
                 results_df, economics, price_data, "outputs/plots"
             )
-            print(f"✓ 可视化图表已生成: {plot_file}")
+            print(f"[OK] 可视化图表已生成: {plot_file}")
             
             # 6. 生成汇总报告
             print("\n6. 生成汇总报告...")
@@ -103,24 +103,24 @@ def test_complete_flow():
             report_file = "outputs/reports/summary_report.txt"
             with open(report_file, 'w', encoding='utf-8') as f:
                 f.write(summary_report)
-            print(f"✓ 汇总报告已保存: {report_file}")
+            print(f"[OK] 汇总报告已保存: {report_file}")
             
             # 打印关键指标
-            print("\n📊 关键指标:")
+            print("\n[METRICS] 关键指标:")
             print(f"  - 总负荷: {technical_metrics['load_total_mwh']:.1f} MWh")
             print(f"  - 可再生能源渗透率: {technical_metrics['renewable_penetration_ratio']:.1%}")
             print(f"  - 自给自足率: {technical_metrics['self_sufficiency_ratio']:.1%}")
             print(f"  - 净运行成本: {economics['net_cost_yuan']:,.0f} 元")
             
-            print("\n🎉 完整流程测试成功！")
+            print("\n[SUCCESS] 完整流程测试成功！")
             return True
             
         else:
-            print(f"❌ 求解失败，状态: {results.solver.termination_condition}")
+            print(f"[FAIL] 求解失败，状态: {results.solver.termination_condition}")
             return False
             
     except Exception as e:
-        print(f"❌ 测试过程中出现错误: {e}")
+        print(f"[FAIL] 测试过程中出现错误: {e}")
         import traceback
         traceback.print_exc()
         return False
@@ -130,7 +130,7 @@ if __name__ == "__main__":
     success = test_complete_flow()
     
     if success:
-        print("\n📁 输出文件检查:")
+        print("\n[FILES] 输出文件检查:")
         
         # 检查outputs目录
         for root, dirs, files in os.walk("outputs"):
@@ -138,4 +138,4 @@ if __name__ == "__main__":
                 file_path = os.path.join(root, file)
                 print(f"  - {file_path}")
     else:
-        print("\n❌ 测试失败，请检查错误信息")
+        print("\n[FAIL] 测试失败，请检查错误信息")

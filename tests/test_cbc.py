@@ -23,14 +23,14 @@ from src.data.data_generator import VPPDataGenerator
 print("\n测试数据生成...")
 gen = VPPDataGenerator()
 load_data, pv_data, wind_data, price_data = gen.generate_all_data()
-print("✓ 数据生成成功")
+print("[OK] 数据生成成功")
 
 # 测试模型创建
 from src.models.vpp_model import VPPOptimizationModel
 print("\n测试模型创建...")
 model = VPPOptimizationModel(gen.time_index)
 energy_system = model.create_energy_system(load_data, pv_data, wind_data, price_data)
-print("✓ 模型创建成功")
+print("[OK] 模型创建成功")
 
 # 测试简单求解
 print("\n测试求解器...")
@@ -43,18 +43,18 @@ try:
     solver = SolverFactory('cbc', executable=cbc_path)
     
     if solver.available():
-        print("✓ CBC求解器可用")
+        print("[OK] CBC求解器可用")
         
         # 尝试简单求解
         results = solver.solve(opt_model, tee=False)
         if results.solver.termination_condition.value == 'optimal':
-            print("✓ 求解成功")
+            print("[OK] 求解成功")
         else:
-            print(f"⚠ 求解状态: {results.solver.termination_condition}")
+            print(f"[WARNING] 求解状态: {results.solver.termination_condition}")
     else:
-        print("❌ CBC求解器不可用")
+        print("[FAIL] CBC求解器不可用")
         
 except Exception as e:
-    print(f"❌ 求解器测试失败: {e}")
+    print(f"[FAIL] 求解器测试失败: {e}")
 
 print("\n测试完成！")

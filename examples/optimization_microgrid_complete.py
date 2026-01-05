@@ -1263,7 +1263,7 @@ def main():
         results_list.append(results)
         detailed_costs_list.append(detailed_costs)
 
-        print(f"   ✓ 场景 {scenario['name']} 完成")
+        print(f"   [OK] 场景 {scenario['name']} 完成")
 
     # 综合对比分析
     print(f"\n【3】生成综合对比分析...")
@@ -1301,13 +1301,13 @@ def main():
     print("【分析完成】")
     print(f"结果保存目录: {results_dir}")
     print("\n生成文件包括:")
-    print("📊 可视化图表:")
+    print("[GRAPH] 可视化图表:")
     print("  - power_scheduling_*.png          # 功率调度图")
     print("  - renewable_utilization_*.png     # 可再生能源利用分析")
     print("  - storage_analysis_*.png          # 储能系统分析")
     print("  - overall_cost_comparison.png     # 成本对比")
     print("  - comprehensive_dashboard.png     # 综合分析仪表板")
-    print("\n📋 分析报告:")
+    print("\n[REPORT] 分析报告:")
     print("  - cost_analysis_report.txt        # 详细成本分析报告")
     print("  - executive_summary.txt           # 执行摘要")
     print("  - optimization_log_*.txt          # 优化日志")

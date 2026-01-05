@@ -50,7 +50,7 @@ class TestVPPSystem(unittest.TestCase):
         self.assertTrue(all(wind_data >= 0))
         self.assertTrue(all(price_data > 0))
         
-        print("✓ 数据生成器测试通过")
+        print("[OK] 数据生成器测试通过")
     
     def test_vpp_model(self):
         """测试虚拟电厂模型"""
@@ -72,7 +72,7 @@ class TestVPPSystem(unittest.TestCase):
         summary = model.get_system_summary()
         self.assertGreater(summary['total_components'], 0)
         
-        print("✓ 虚拟电厂模型测试通过")
+        print("[OK] 虚拟电厂模型测试通过")
     
     def test_optimization_solver(self):
         """测试优化求解器"""
@@ -95,9 +95,9 @@ class TestVPPSystem(unittest.TestCase):
         if success:
             results = solver.get_results()
             self.assertIsNotNone(results)
-            print("✓ 优化求解器测试通过")
+            print("[OK] 优化求解器测试通过")
         else:
-            print("⚠ 优化求解器测试未完全成功（可能是求解器配置问题）")
+            print("[WARNING] 优化求解器测试未完全成功（可能是求解器配置问题）")
     
     def test_full_workflow(self):
         """测试完整工作流程"""
@@ -154,7 +154,7 @@ def run_tests():
             print(f"- {test}: {traceback}")
     
     success = len(result.failures) + len(result.errors) == 0
-    print(f"\n整体测试结果: {'✅ 通过' if success else '❌ 失败'}")
+    print(f"\n整体测试结果: {'[PASS] 通过' if success else '[FAIL] 失败'}")
     
     return success
 
