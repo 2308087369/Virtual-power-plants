@@ -351,7 +351,11 @@ class VPPSchedulingManager:
             'gas_turbine': False,
             'battery_storage': False,
             'adjustable_loads': False,
-            'ancillary_services': False
+            'ancillary_services': False,
+            'ev_charging_station': False,
+            'interruptible_loads': False,
+            'building_hvac': False,
+            'demand_response': False
         }
         
         # 检查能源资源
@@ -364,6 +368,17 @@ class VPPSchedulingManager:
         # 检查可调负荷
         adjustable_loads = config.get('adjustable_loads', {})
         resources['adjustable_loads'] = len(adjustable_loads) > 0
+        resources['ev_charging_station'] = config.get('ev_charging_station', {}).get('enabled', False)
+        resources['interruptible_loads'] = any(
+            item.get('enabled', True) for item in config.get('interruptible_loads', {}).values()
+        )
+        resources['building_hvac'] = any(
+            item.get('enabled', True) for item in config.get('building_hvac', {}).values()
+        )
+        resources['demand_response'] = (
+            config.get('price_based_dr', {}).get('enabled', False) or
+            config.get('incentive_based_dr', {}).get('enabled', False)
+        )
         
         # 检查辅助服务
         if resources['battery_storage']:
@@ -734,6 +749,22 @@ class OptimizedVPPModel(VPPOptimizationModel):
         adjustable_loads = self.config.get('adjustable_loads', {})
         for load in adjustable_loads.keys():
             resources.append(f"adjustable_load_{load}")
+
+        if self.config.get('ev_charging_station', {}).get('enabled', False):
+            resources.append('ev_charging_station')
+
+        for load_name, load_cfg in self.config.get('interruptible_loads', {}).items():
+            if load_cfg.get('enabled', True):
+                resources.append(f"interruptible_load_{load_name}")
+
+        for building_name, building_cfg in self.config.get('building_hvac', {}).items():
+            if building_cfg.get('enabled', True):
+                resources.append(f"building_hvac_{building_name}")
+
+        if self.config.get('price_based_dr', {}).get('enabled', False):
+            resources.append('price_based_demand_response')
+        if self.config.get('incentive_based_dr', {}).get('enabled', False):
+            resources.append('incentive_based_demand_response')
         
         return resources
     

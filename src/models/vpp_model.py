@@ -10,7 +10,7 @@ import yaml
 import logging
 import pandas as pd
 import numpy as np
-from typing import Dict, Optional, Tuple
+from typing import Dict, Optional, Tuple, List
 import warnings
 warnings.filterwarnings('ignore')
 
@@ -165,6 +165,48 @@ class VPPOptimizationModel:
                     'max_power_ratio': 1.0,
                     'cop': 3.5,
                     'operating_cost_yuan_mwh': 40
+                }
+            },
+            'ev_charging_station': {
+                'enabled': False,
+                'num_chargers': 10,
+                'charger_power_kw': 7,
+                'fast_charger_power_kw': 30,
+                'num_fast_chargers': 2,
+                'operating_cost_yuan_mwh': 20,
+                'average_utilization_ratio': 0.5,
+                'min_service_ratio': 0.9,
+                'demand_pattern': {
+                    'morning_peak': [7, 9],
+                    'evening_peak': [17, 21],
+                    'avg_energy_demand_kwh': 30
+                }
+            },
+            'interruptible_loads': {
+                'industrial_plant_1': {
+                    'enabled': False,
+                    'rated_power_mw': 5,
+                    'interruptible_ratio': 0.3,
+                    'max_interruption_hours': 4,
+                    'min_service_ratio': 0.8,
+                    'interruption_levels': {
+                        'level_1': {'capacity_mw': 1.0, 'compensation_yuan_mwh': 500},
+                        'level_2': {'capacity_mw': 0.5, 'compensation_yuan_mwh': 300}
+                    }
+                }
+            },
+            'building_hvac': {
+                'office_building_1': {
+                    'enabled': False,
+                    'rated_power_mw': 2,
+                    'operating_cost_yuan_mwh': 45,
+                    'thermal_mass_kwh_per_c': 500,
+                    'temperature_range': [20, 26],
+                    'target_temperature_c': 23,
+                    'initial_temperature_c': 24,
+                    'pre_cooling_hours': 2,
+                    'outdoor_temp_pattern': [10] * 24,
+                    'min_operating_ratio': 0.35
                 }
             },
             'grid_connection': {
@@ -453,6 +495,10 @@ class VPPOptimizationModel:
         # 冷机系统
         if 'chiller' in adjustable_loads_config:
             chiller_config = adjustable_loads_config['chiller']
+            max_profile = self._apply_demand_response_profile(
+                'chiller',
+                np.full(self.periods, chiller_config.get('max_power_ratio', 1.0), dtype=float)
+            )
             
             chiller_load = solph.components.Sink(
                 label="chiller_load",
@@ -461,7 +507,7 @@ class VPPOptimizationModel:
                         nominal_value=chiller_config['rated_power_mw'],
                         variable_costs=chiller_config['operating_cost_yuan_mwh'],
                         min=chiller_config['min_power_ratio'],
-                        max=chiller_config['max_power_ratio']
+                        max=max_profile
                     )
                 }
             )
@@ -470,6 +516,10 @@ class VPPOptimizationModel:
         # 热机系统
         if 'heat_pump' in adjustable_loads_config:
             heat_pump_config = adjustable_loads_config['heat_pump']
+            max_profile = self._apply_demand_response_profile(
+                'heat_pump',
+                np.full(self.periods, heat_pump_config.get('max_power_ratio', 1.0), dtype=float)
+            )
             
             heat_pump_load = solph.components.Sink(
                 label="heat_pump_load",
@@ -478,13 +528,213 @@ class VPPOptimizationModel:
                         nominal_value=heat_pump_config['rated_power_mw'],
                         variable_costs=heat_pump_config['operating_cost_yuan_mwh'],
                         min=heat_pump_config['min_power_ratio'],
-                        max=heat_pump_config['max_power_ratio']
+                        max=max_profile
                     )
                 }
             )
             adjustable_loads.append(heat_pump_load)
+
+        adjustable_loads.extend(self._create_ev_charging_station())
+        adjustable_loads.extend(self._create_interruptible_loads())
+        adjustable_loads.extend(self._create_building_hvac())
         
         self.components['adjustable_loads'] = adjustable_loads
+
+    def _get_hour_mask(self, hour_ranges: List[List[int]]) -> np.ndarray:
+        """根据小时区间生成掩码"""
+        mask = np.zeros(self.periods, dtype=float)
+        for start_hour, end_hour in hour_ranges:
+            for idx, timestamp in enumerate(self.time_index):
+                if start_hour <= timestamp.hour <= end_hour:
+                    mask[idx] = 1.0
+        return mask
+
+    def _get_time_step_hours(self) -> float:
+        """获取当前模型的时间步长（小时）"""
+        if len(self.time_index) < 2:
+            return 1.0
+        return max((self.time_index[1] - self.time_index[0]).total_seconds() / 3600.0, 1e-6)
+
+    def _get_peak_valley_masks(self) -> Tuple[np.ndarray, np.ndarray]:
+        """获取峰谷时段掩码"""
+        dr_config = self.config.get('price_based_dr', {})
+        tariff = dr_config.get('tariff_structure', {})
+        peak_hours = tariff.get('peak_hours', [8, 11, 18, 21])
+        valley_hours = tariff.get('valley_hours', [0, 7])
+
+        peak_ranges = []
+        if len(peak_hours) >= 2:
+            peak_ranges.append([peak_hours[0], peak_hours[1]])
+        if len(peak_hours) >= 4:
+            peak_ranges.append([peak_hours[2], peak_hours[3]])
+
+        valley_ranges = [[valley_hours[0], valley_hours[1]]] if len(valley_hours) >= 2 else []
+        return self._get_hour_mask(peak_ranges), self._get_hour_mask(valley_ranges)
+
+    def _apply_demand_response_profile(self, load_name: str, base_profile: np.ndarray) -> np.ndarray:
+        """对柔性负荷施加需求响应控制"""
+        profile = np.array(base_profile, dtype=float)
+
+        price_dr = self.config.get('price_based_dr', {})
+        if price_dr.get('enabled', False):
+            peak_mask, valley_mask = self._get_peak_valley_masks()
+            peak_ratio = price_dr.get('flexible_load_peak_reduction_ratio', 0.8)
+            valley_ratio = price_dr.get('flexible_load_valley_boost_ratio', 1.1)
+            profile = np.where(peak_mask > 0, profile * peak_ratio, profile)
+            profile = np.where(valley_mask > 0, np.minimum(profile * valley_ratio, 1.0), profile)
+
+        incentive_dr = self.config.get('incentive_based_dr', {})
+        dlc_config = incentive_dr.get('direct_load_control', {})
+        controllable_loads = dlc_config.get('controllable_loads', [])
+        if incentive_dr.get('enabled', False) and dlc_config.get('enabled', False) and load_name in controllable_loads:
+            event_hours = incentive_dr.get('event_hours', [])
+            max_power_ratio = dlc_config.get('max_power_ratio', 0.7)
+            for idx, timestamp in enumerate(self.time_index):
+                if timestamp.hour in event_hours:
+                    profile[idx] = min(profile[idx], max_power_ratio)
+
+        return np.clip(profile, 0.0, 1.0)
+
+    def _create_ev_charging_station(self) -> List:
+        """创建EV充电站模型"""
+        ev_config = self.config.get('ev_charging_station', {})
+        if not ev_config.get('enabled', False):
+            return []
+
+        num_fast = ev_config.get('num_fast_chargers', 0)
+        num_total = ev_config.get('num_chargers', 0)
+        num_slow = max(num_total - num_fast, 0)
+        nominal_power_mw = (
+            num_slow * ev_config.get('charger_power_kw', 7) +
+            num_fast * ev_config.get('fast_charger_power_kw', 30)
+        ) / 1000.0
+
+        if nominal_power_mw <= 0:
+            return []
+
+        time_step_hours = self._get_time_step_hours()
+        horizon_hours = self.periods * time_step_hours
+
+        demand_pattern = ev_config.get('demand_pattern', {})
+        hour_ranges = []
+        for key in ('morning_peak', 'evening_peak'):
+            if key in demand_pattern and len(demand_pattern[key]) >= 2:
+                hour_ranges.append([demand_pattern[key][0], demand_pattern[key][1]])
+
+        availability_profile = self._get_hour_mask(hour_ranges) if hour_ranges else np.ones(self.periods)
+        availability_profile = self._apply_demand_response_profile('ev_charging_station', availability_profile)
+        available_hours = max(float(availability_profile.sum() * time_step_hours), time_step_hours)
+
+        avg_energy_kwh = demand_pattern.get('avg_energy_demand_kwh', 30)
+        utilization_ratio = ev_config.get('average_utilization_ratio', 0.6)
+        required_energy_mwh = (avg_energy_kwh * num_total * utilization_ratio) / 1000.0
+        required_energy_mwh *= horizon_hours / 24.0
+        service_ratio = ev_config.get('min_service_ratio', 0.9)
+        service_hours = min((required_energy_mwh * service_ratio) / nominal_power_mw, available_hours)
+
+        ev_load = solph.components.Sink(
+            label="ev_charging_station",
+            inputs={
+                self.components['bus_electricity']: solph.Flow(
+                    nominal_value=nominal_power_mw,
+                    variable_costs=ev_config.get('operating_cost_yuan_mwh', 20),
+                    min=0.0,
+                    max=availability_profile,
+                    full_load_time_min=max(service_hours, 0.0),
+                    full_load_time_max=min((required_energy_mwh / nominal_power_mw) * 1.05, available_hours)
+                )
+            }
+        )
+        return [ev_load]
+
+    def _create_interruptible_loads(self) -> List:
+        """创建工业可中断负荷模型"""
+        interruptible_config = self.config.get('interruptible_loads', {})
+        components = []
+        time_step_hours = self._get_time_step_hours()
+        horizon_hours = self.periods * time_step_hours
+
+        for load_name, load_config in interruptible_config.items():
+            if not load_config.get('enabled', True):
+                continue
+
+            levels = load_config.get('interruption_levels', {})
+            level_capacity = sum(level.get('capacity_mw', 0.0) for level in levels.values())
+            fallback_capacity = load_config.get('rated_power_mw', 0.0) * load_config.get('interruptible_ratio', 0.0)
+            interruptible_capacity = level_capacity if level_capacity > 0 else fallback_capacity
+            if interruptible_capacity <= 0:
+                continue
+
+            max_interruption_hours = load_config.get('max_interruption_hours', 4)
+            min_service_ratio = load_config.get('min_service_ratio', 0.8)
+            service_hours = max(
+                horizon_hours * min_service_ratio,
+                horizon_hours - min(max_interruption_hours, horizon_hours)
+            )
+            max_profile = self._apply_demand_response_profile(f'interruptible_load_{load_name}', np.ones(self.periods))
+
+            load_component = solph.components.Sink(
+                label=f"interruptible_load_{load_name}",
+                inputs={
+                    self.components['bus_electricity']: solph.Flow(
+                        nominal_value=interruptible_capacity,
+                        variable_costs=0,
+                        min=0.0,
+                        max=max_profile,
+                        full_load_time_min=min(service_hours, float(max_profile.sum() * time_step_hours))
+                    )
+                }
+            )
+            components.append(load_component)
+
+        return components
+
+    def _create_building_hvac(self) -> List:
+        """创建商业楼宇空调模型"""
+        hvac_config = self.config.get('building_hvac', {})
+        components = []
+        time_step_hours = self._get_time_step_hours()
+        horizon_hours = self.periods * time_step_hours
+
+        for building_name, building in hvac_config.items():
+            if not building.get('enabled', True):
+                continue
+
+            rated_power = building.get('rated_power_mw', 0.0)
+            if rated_power <= 0:
+                continue
+
+            min_operating_ratio = building.get('min_operating_ratio', 0.35)
+            full_load_time_min = horizon_hours * min_operating_ratio
+            max_profile = self._apply_demand_response_profile(
+                f'building_hvac_{building_name}',
+                np.ones(self.periods)
+            )
+
+            pre_cooling_hours = int(building.get('pre_cooling_hours', 0))
+            if pre_cooling_hours > 0:
+                peak_mask, _ = self._get_peak_valley_masks()
+                peak_indices = np.where(peak_mask > 0)[0]
+                if len(peak_indices) > 0:
+                    first_peak = peak_indices[0]
+                    start_idx = max(first_peak - pre_cooling_hours, 0)
+                    max_profile[start_idx:first_peak] = 1.0
+
+            hvac_component = solph.components.Sink(
+                label=f"building_hvac_{building_name}",
+                inputs={
+                    self.components['bus_electricity']: solph.Flow(
+                        nominal_value=rated_power,
+                        variable_costs=building.get('operating_cost_yuan_mwh', 45),
+                        min=0.0,
+                        max=max_profile,
+                        full_load_time_min=min(full_load_time_min, float(max_profile.sum() * time_step_hours))
+                    )
+                }
+            )
+            components.append(hvac_component)
+
+        return components
     
     def _create_grid_connection(self, price_data: pd.Series):
         """创建电网连接"""

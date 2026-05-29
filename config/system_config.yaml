@@ -88,6 +88,105 @@ adjustable_loads:
     demand_response_capability: true  # 需求响应能力
     response_time_minutes: 3  # 响应时间 (分钟)
 
+# EV充电站配置（单向充电）
+ev_charging_station:
+  enabled: true
+  num_chargers: 20
+  charger_power_kw: 7
+  fast_charger_power_kw: 30
+  num_fast_chargers: 5
+  operating_cost_yuan_mwh: 20
+  average_utilization_ratio: 0.65
+  min_service_ratio: 0.92
+  demand_pattern:
+    morning_peak: [7, 9]
+    evening_peak: [17, 21]
+    avg_energy_demand_kwh: 30
+
+# 工业可中断负荷配置
+interruptible_loads:
+  industrial_plant_1:
+    enabled: true
+    rated_power_mw: 5
+    interruptible_ratio: 0.3
+    interruption_levels:
+      level_1:
+        capacity_mw: 1
+        response_time_min: 10
+        compensation_yuan_mwh: 500
+      level_2:
+        capacity_mw: 0.5
+        response_time_min: 30
+        compensation_yuan_mwh: 300
+      level_3:
+        capacity_mw: 0.3
+        response_time_min: 60
+        compensation_yuan_mwh: 150
+    max_interruption_hours: 4
+    min_recovery_hours: 2
+    min_service_ratio: 0.8
+
+# 商业楼宇空调配置
+building_hvac:
+  office_building_1:
+    enabled: true
+    rated_power_mw: 2
+    cop: 3.5
+    thermal_mass_kwh_per_c: 500
+    temperature_range: [20, 26]
+    target_temperature_c: 23
+    initial_temperature_c: 24
+    outdoor_temp_pattern: [5, 8, 10, 12, 15, 18, 20, 22, 24, 25, 26, 25, 24, 22, 20, 18, 15, 12, 10, 8, 6, 5, 4, 3]
+    pre_cooling_hours: 2
+    operating_cost_yuan_mwh: 45
+    min_operating_ratio: 0.35
+
+# 价格型需求响应
+price_based_dr:
+  enabled: true
+  tariff_structure:
+    peak_hours: [8, 11, 18, 21]
+    valley_hours: [0, 7]
+    peak_price_ratio: 1.5
+    valley_price_ratio: 0.5
+  elasticity_matrix:
+    self_elasticity: -0.3
+    cross_elasticity: 0.1
+  flexible_load_peak_reduction_ratio: 0.75
+  flexible_load_valley_boost_ratio: 1.15
+
+# 激励型需求响应
+incentive_based_dr:
+  enabled: true
+  event_hours: [9, 11, 18, 20]
+  direct_load_control:
+    enabled: true
+    controllable_loads: ["chiller", "heat_pump", "building_hvac_office_building_1"]
+    max_control_hours: 4
+    control_interval_min: 15
+    max_power_ratio: 0.7
+    incentive_rate_yuan_mwh: 200
+  interruptible_load:
+    enabled: true
+    incentive_rate_yuan_mwh: 400
+
+# 多时间尺度调度
+multi_time_scheduling:
+  enabled: true
+  day_ahead_horizon_hours: 24
+  intraday_horizon_hours: 6
+  intraday_resolution_minutes: 30
+  realtime_horizon_hours: 2
+  realtime_resolution_minutes: 15
+
+# 不确定性场景生成
+uncertainty_scenarios:
+  enabled: true
+  num_scenarios: 5
+  load_sigma: 0.04
+  renewable_sigma: 0.12
+  price_sigma: 0.08
+
 # 电网交易配置
 grid_connection:
   max_purchase_mw: 10  # 最大购电功率 (MW)

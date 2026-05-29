@@ -4,7 +4,7 @@
 
 An advanced Virtual Power Plant (VPP) multi-resource coordination and optimization system built on oemof-solph framework with CBC solver for linear programming optimization.
 
-![VPP Optimization Results](examples/optimization_results.png)
+![VPP Optimization Results](docs/assets/realtime_hierarchical_results.png)
 
 ## 🎯 Overview
 
@@ -18,6 +18,7 @@ This project provides intelligent energy resource scheduling strategies for VPPs
 - **Multi-objective optimization**: Cost minimization and profit maximization
 - **Ancillary services**: Energy storage participation in frequency regulation and spinning reserve
 - **Demand response**: Adjustable loads (chiller, heat pump) with demand response capabilities
+- **Hierarchical dispatch**: Day-ahead planning, intraday rolling correction, and real-time rolling execution
 - **Separated storage modeling**: Converter + GenericStorage architecture ensuring physical constraints
 - **Interactive interface**: User-friendly mode selection and optimization objective choice
 
@@ -40,11 +41,8 @@ pip install -e .
 # Interactive mode (recommended)
 python main.py
 
-# Demo mode
-python main.py --demo
-
-# Specific scheduling mode
-python main.py --mode=full_system
+# Specific hierarchical scheduling mode
+python main.py --mode full_system --objective cost_minimization
 
 # Compare all modes
 python main.py --compare-all
@@ -63,6 +61,7 @@ python tests/run_tests.py --type basic        # Basic functionality
 python tests/run_tests.py --type cbc          # CBC solver
 python tests/run_tests.py --type scheduling   # Scheduling modes
 python tests/run_tests.py --type objectives   # Optimization objectives
+python tests/run_tests.py --test roadmap      # Roadmap and hierarchical dispatch checks
 ```
 
 ## Configuration
@@ -104,11 +103,12 @@ Edit configuration files to customize system parameters:
 ## 📁 Output Structure
 
 Results organized in `outputs/{mode}_{objective}_{timestamp}/`:
-- `optimization_results.csv`: Detailed scheduling results
-- `economics_analysis.csv`: Economic analysis with ancillary service revenues
-- `technical_metrics.csv`: Technical performance indicators
-- `summary_report.txt`: Operation summary with mode-specific insights
-- `optimization_results.png`: Visualization charts
+- `data/`: Base input data and multi-timescale input datasets
+- `results/`: Day-ahead, intraday, and real-time dispatch results
+- `economics/`: Stage-level economic analysis
+- `metrics/`: Stage-level metrics, scenario summary, and hierarchical stage summary
+- `reports/`: Stage reports and the final `hierarchical_dispatch_report.txt`
+- `plots/`: Day-ahead, intraday, and real-time visualization charts
 
 ## 🏗️ Architecture
 
@@ -133,13 +133,45 @@ vpp_opt_test_qqder/
 - Physical constraint compliance
 - Executable scheduling results
 
-## 📈 Typical Results
+## 📈 Latest Hierarchical Results
 
-Based on 24-hour optimization:
-- **Renewable Penetration**: 49.1%
-- **Ancillary Service Revenue**: 49,450 yuan/day
-- **Optimal Mode**: renewable_storage (most profitable)
-- **Storage Arbitrage**: Effective peak shaving and valley filling
+Latest full-system cost-minimization experiment:
+- **Command**: `python main.py --mode full_system --objective cost_minimization`
+- **Output Directory**: `outputs/full_system_cost_minimization_20260529_095947/`
+- **Scenario Summary**: 5 uncertainty scenarios, average price range `415.07-428.22` yuan/MWh
+
+### Stage Summary
+
+| Stage | Time Steps | Net Cost (yuan) | Avg Cost (yuan/MWh) | Load (MWh) | Renewable Penetration | Final SOC |
+|---|---:|---:|---:|---:|---:|---:|
+| Day-ahead | 24 | -76,490.75 | -604.21 | 126.60 | 67.93% | 0.0000 |
+| Intraday | 48 | -51,139.96 | -389.80 | 131.20 | 62.20% | 0.0065 |
+| Real-time | 96 | -15,631.36 | -119.14 | 131.20 | 59.53% | 0.0020 |
+
+### Rolling Execution Notes
+- **Intraday rolling windows**: 48 windows, with optimized execution in part of the morning and afternoon windows and baseline fallback for infeasible windows
+- **Real-time rolling windows**: 96 windows, with optimized execution concentrated around `05:30-06:45`, `15:30-16:45`, and `21:30-21:45`
+- **Operational interpretation**: The hierarchical workflow now completes end-to-end, while short rolling windows still rely on baseline fallback when local constraints become infeasible
+
+### Latest Visualizations
+
+Day-ahead dispatch:
+
+![Day-Ahead Hierarchical Dispatch](docs/assets/day_ahead_hierarchical_results.png)
+
+Intraday rolling dispatch:
+
+![Intraday Hierarchical Dispatch](docs/assets/intraday_hierarchical_results.png)
+
+Real-time rolling dispatch:
+
+![Real-Time Hierarchical Dispatch](docs/assets/realtime_hierarchical_results.png)
+
+### Latest Result Files
+- Stage summary: [hierarchical_stage_summary.csv](file:///d:/py_work/vpp_opt_test_qqder/outputs/full_system_cost_minimization_20260529_095947/metrics/hierarchical_stage_summary.csv)
+- Final report: [hierarchical_dispatch_report.txt](file:///d:/py_work/vpp_opt_test_qqder/outputs/full_system_cost_minimization_20260529_095947/reports/hierarchical_dispatch_report.txt)
+- Intraday windows: [intraday_rolling_windows.csv](file:///d:/py_work/vpp_opt_test_qqder/outputs/full_system_cost_minimization_20260529_095947/results/intraday_rolling_windows.csv)
+- Real-time windows: [realtime_rolling_windows.csv](file:///d:/py_work/vpp_opt_test_qqder/outputs/full_system_cost_minimization_20260529_095947/results/realtime_rolling_windows.csv)
 
 ## 🛠️ Technology Stack
 

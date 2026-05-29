@@ -34,6 +34,7 @@ class ResultAnalyzer:
         self.results_df = None
         self.economics = None
         self.technical_metrics = None
+        self.time_step_hours = 1.0
     
     def _load_config(self, config_path: Optional[str]) -> Dict:
         """加载配置文件"""
@@ -69,6 +70,7 @@ class ResultAnalyzer:
         self.optimization_results = optimization_results
         self.energy_system = energy_system
         self.time_index = time_index
+        self.time_step_hours = self._get_time_step_hours()
         
         # 提取时间序列结果
         self.results_df = self._extract_time_series_results()
@@ -81,6 +83,16 @@ class ResultAnalyzer:
         
         print("结果分析完成！")
         return self.results_df, self.economics, self.technical_metrics
+
+    def _get_time_step_hours(self) -> float:
+        """获取时间步长（小时）"""
+        if self.time_index is None or len(self.time_index) < 2:
+            return 1.0
+        return max((self.time_index[1] - self.time_index[0]).total_seconds() / 3600.0, 1e-6)
+
+    def _series_energy(self, series: pd.Series) -> float:
+        """将功率序列转换为电量"""
+        return float(series.sum() * self.time_step_hours)
     
     def _extract_time_series_results(self) -> pd.DataFrame:
         """提取时间序列结果"""
@@ -174,6 +186,9 @@ class ResultAnalyzer:
         if battery_charge_mw is not None and battery_discharge_mw is not None:
             results_df['battery_net_mw'] = battery_discharge_mw + battery_charge_mw  # 注意：charge已经是负值
         if battery_soc is not None:
+            battery_capacity = self.config.get('energy_resources', {}).get('battery_storage', {}).get('energy_capacity_mwh', 0)
+            if battery_capacity > 0 and np.nanmax(np.abs(battery_soc)) > 1.0 + 1e-6:
+                battery_soc = battery_soc / battery_capacity
             results_df['battery_soc'] = battery_soc
         
         # 提取电网交互
@@ -197,6 +212,26 @@ class ResultAnalyzer:
             heat_pump_sequences = component_results['heat_pump_load']['sequences']
             if not heat_pump_sequences.empty:
                 results_df['heat_pump_load_mw'] = heat_pump_sequences.iloc[:, 0].values
+
+        # 提取EV充电站
+        if 'ev_charging_station' in component_results:
+            ev_sequences = component_results['ev_charging_station']['sequences']
+            if not ev_sequences.empty:
+                results_df['ev_charging_power_mw'] = ev_sequences.iloc[:, 0].values
+
+        # 提取工业可中断负荷
+        for node_label, node_results in component_results.items():
+            if node_label.startswith('interruptible_load_'):
+                sequences = node_results.get('sequences')
+                if sequences is not None and not sequences.empty:
+                    results_df[f'{node_label}_mw'] = sequences.iloc[:, 0].values
+
+        # 提取楼宇HVAC
+        for node_label, node_results in component_results.items():
+            if node_label.startswith('building_hvac_'):
+                sequences = node_results.get('sequences')
+                if sequences is not None and not sequences.empty:
+                    results_df[f'{node_label}_mw'] = sequences.iloc[:, 0].values
         
         # 提取辅助服务
         if 'freq_reg_up_service' in component_results:
@@ -264,6 +299,20 @@ class ResultAnalyzer:
             results_df['power_balance_mw'] = results_df['total_supply_mw'] - results_df['load_demand_mw']
         else:
             results_df['power_balance_mw'] = results_df['total_supply_mw']
+
+        flexible_load_cols = [
+            col for col in results_df.columns
+            if (
+                col.endswith('_load_mw') or
+                col == 'ev_charging_power_mw' or
+                col.startswith('interruptible_load_') or
+                col.startswith('building_hvac_')
+            )
+        ]
+        if flexible_load_cols:
+            results_df['total_flexible_load_mw'] = results_df[flexible_load_cols].sum(axis=1)
+        else:
+            results_df['total_flexible_load_mw'] = 0.0
     
     def _calculate_economics(self, price_data: pd.Series) -> Dict[str, float]:
         """计算经济性指标"""
@@ -281,8 +330,8 @@ class ResultAnalyzer:
         pv_cost_rate = energy_config.get('photovoltaic', {}).get('variable_cost_yuan_mwh', 5)
         wind_cost_rate = energy_config.get('wind', {}).get('variable_cost_yuan_mwh', 8)
         
-        pv_energy = self.results_df.get('pv_generation_mw', pd.Series(0, index=self.time_index)).sum()
-        wind_energy = self.results_df.get('wind_generation_mw', pd.Series(0, index=self.time_index)).sum()
+        pv_energy = self._series_energy(self.results_df.get('pv_generation_mw', pd.Series(0, index=self.time_index)))
+        wind_energy = self._series_energy(self.results_df.get('wind_generation_mw', pd.Series(0, index=self.time_index)))
         
         economics['pv_cost_yuan'] = pv_energy * pv_cost_rate
         economics['wind_cost_yuan'] = wind_energy * wind_cost_rate
@@ -290,7 +339,7 @@ class ResultAnalyzer:
         
         # 传统发电成本
         gas_cost_rate = energy_config.get('gas_turbine', {}).get('variable_cost_yuan_mwh', 600)
-        gas_energy = self.results_df.get('gas_generation_mw', pd.Series(0, index=self.time_index)).sum()
+        gas_energy = self._series_energy(self.results_df.get('gas_generation_mw', pd.Series(0, index=self.time_index)))
         economics['gas_cost_yuan'] = gas_energy * gas_cost_rate
         
         # 储能成本（包含循环损耗）
@@ -299,8 +348,8 @@ class ResultAnalyzer:
         discharge_cost_rate = battery_config.get('discharge_cost_yuan_mwh', 12)
         cycle_degradation_cost_rate = battery_config.get('cycle_degradation_cost_yuan_mwh', 15)
         
-        battery_charge_energy = abs(self.results_df.get('battery_charge_mw', pd.Series(0, index=self.time_index))).sum()
-        battery_discharge_energy = self.results_df.get('battery_discharge_mw', pd.Series(0, index=self.time_index)).sum()
+        battery_charge_energy = self._series_energy(abs(self.results_df.get('battery_charge_mw', pd.Series(0, index=self.time_index))))
+        battery_discharge_energy = self._series_energy(self.results_df.get('battery_discharge_mw', pd.Series(0, index=self.time_index)))
         
         # 基本运行成本
         economics['battery_charge_cost_yuan'] = battery_charge_energy * charge_cost_rate
@@ -328,15 +377,54 @@ class ResultAnalyzer:
         
         # 冷机成本
         chiller_cost_rate = adjustable_loads_config.get('chiller', {}).get('operating_cost_yuan_mwh', 50)
-        chiller_energy = self.results_df.get('chiller_load_mw', pd.Series(0, index=self.time_index)).sum()
+        chiller_energy = self._series_energy(self.results_df.get('chiller_load_mw', pd.Series(0, index=self.time_index)))
         economics['chiller_cost_yuan'] = chiller_energy * chiller_cost_rate
         
         # 热机成本
         heat_pump_cost_rate = adjustable_loads_config.get('heat_pump', {}).get('operating_cost_yuan_mwh', 40)
-        heat_pump_energy = self.results_df.get('heat_pump_load_mw', pd.Series(0, index=self.time_index)).sum()
+        heat_pump_energy = self._series_energy(self.results_df.get('heat_pump_load_mw', pd.Series(0, index=self.time_index)))
         economics['heat_pump_cost_yuan'] = heat_pump_energy * heat_pump_cost_rate
         
         economics['adjustable_loads_cost_yuan'] = economics['chiller_cost_yuan'] + economics['heat_pump_cost_yuan']
+
+        # EV充电站成本
+        ev_config = self.config.get('ev_charging_station', {})
+        ev_energy = self._series_energy(self.results_df.get('ev_charging_power_mw', pd.Series(0, index=self.time_index)))
+        economics['ev_charging_cost_yuan'] = ev_energy * ev_config.get('operating_cost_yuan_mwh', 20)
+
+        # 工业可中断负荷补偿成本
+        interruptible_compensation = 0.0
+        for load_name, load_cfg in self.config.get('interruptible_loads', {}).items():
+            flow_key = f'interruptible_load_{load_name}_mw'
+            actual_energy = self._series_energy(self.results_df.get(flow_key, pd.Series(0, index=self.time_index)))
+            levels = load_cfg.get('interruption_levels', {})
+            level_capacity = sum(level.get('capacity_mw', 0.0) for level in levels.values())
+            nominal_capacity = level_capacity if level_capacity > 0 else (
+                load_cfg.get('rated_power_mw', 0.0) * load_cfg.get('interruptible_ratio', 0.0)
+            )
+            service_hours = max(
+                len(self.time_index) * load_cfg.get('min_service_ratio', 0.8),
+                len(self.time_index) - load_cfg.get('max_interruption_hours', 4)
+            )
+            baseline_energy = nominal_capacity * min(service_hours, len(self.time_index))
+            curtailed_energy = max(baseline_energy - actual_energy, 0.0)
+            compensation_rate = np.mean(
+                [level.get('compensation_yuan_mwh', 0.0) for level in levels.values()]
+            ) if levels else load_cfg.get('compensation_yuan_mwh', 0.0)
+            compensation = curtailed_energy * compensation_rate
+            economics[f'interruptible_compensation_{load_name}_yuan'] = compensation
+            interruptible_compensation += compensation
+        economics['interruptible_load_compensation_yuan'] = interruptible_compensation
+
+        # 楼宇HVAC运行成本
+        building_hvac_cost = 0.0
+        for building_name, building_cfg in self.config.get('building_hvac', {}).items():
+            flow_key = f'building_hvac_{building_name}_mw'
+            hvac_energy = self._series_energy(self.results_df.get(flow_key, pd.Series(0, index=self.time_index)))
+            building_cost = hvac_energy * building_cfg.get('operating_cost_yuan_mwh', 45)
+            economics[f'building_hvac_{building_name}_cost_yuan'] = building_cost
+            building_hvac_cost += building_cost
+        economics['building_hvac_cost_yuan'] = building_hvac_cost
         
         # 辅助服务收入
         battery_config = self.config.get('energy_resources', {}).get('battery_storage', {})
@@ -345,8 +433,8 @@ class ResultAnalyzer:
         # 调频服务收入
         freq_reg_config = ancillary_config.get('frequency_regulation', {})
         if freq_reg_config.get('enable', False):
-            freq_reg_up_capacity = self.results_df.get('freq_reg_up_mw', pd.Series(0, index=self.time_index)).sum()
-            freq_reg_down_capacity = self.results_df.get('freq_reg_down_mw', pd.Series(0, index=self.time_index)).sum()
+            freq_reg_up_capacity = self._series_energy(self.results_df.get('freq_reg_up_mw', pd.Series(0, index=self.time_index)))
+            freq_reg_down_capacity = self._series_energy(self.results_df.get('freq_reg_down_mw', pd.Series(0, index=self.time_index)))
             
             freq_reg_up_price = freq_reg_config.get('up_price_yuan_mw', 80)
             freq_reg_down_price = freq_reg_config.get('down_price_yuan_mw', 70)
@@ -360,8 +448,8 @@ class ResultAnalyzer:
         # 备用服务收入
         spin_reserve_config = ancillary_config.get('spinning_reserve', {})
         if spin_reserve_config.get('enable', False):
-            spin_reserve_up_capacity = self.results_df.get('spin_reserve_up_mw', pd.Series(0, index=self.time_index)).sum()
-            spin_reserve_down_capacity = self.results_df.get('spin_reserve_down_mw', pd.Series(0, index=self.time_index)).sum()
+            spin_reserve_up_capacity = self._series_energy(self.results_df.get('spin_reserve_up_mw', pd.Series(0, index=self.time_index)))
+            spin_reserve_down_capacity = self._series_energy(self.results_df.get('spin_reserve_down_mw', pd.Series(0, index=self.time_index)))
             
             spin_reserve_up_price = spin_reserve_config.get('up_price_yuan_mw', 60)
             spin_reserve_down_price = spin_reserve_config.get('down_price_yuan_mw', 50)
@@ -387,18 +475,21 @@ class ResultAnalyzer:
             print(f"警告：电价数据长度({len(price_data)})与结果数据长度({len(grid_purchase_energy)})不匹配")
             # 使用平均电价
             avg_price = price_data.mean()
-            economics['grid_purchase_cost_yuan'] = grid_purchase_energy.sum() * avg_price
-            economics['grid_sale_revenue_yuan'] = grid_sale_energy.sum() * avg_price * 0.95
+            economics['grid_purchase_cost_yuan'] = self._series_energy(grid_purchase_energy) * avg_price
+            economics['grid_sale_revenue_yuan'] = self._series_energy(grid_sale_energy) * avg_price * 0.95
         else:
-            economics['grid_purchase_cost_yuan'] = (grid_purchase_energy * price_data).sum()
-            economics['grid_sale_revenue_yuan'] = (grid_sale_energy * price_data * 0.95).sum()
+            economics['grid_purchase_cost_yuan'] = float((grid_purchase_energy * price_data).sum() * self.time_step_hours)
+            economics['grid_sale_revenue_yuan'] = float((grid_sale_energy * price_data * 0.95).sum() * self.time_step_hours)
         
         # 总成本和收益
         economics['total_generation_cost_yuan'] = (
             economics['renewable_cost_yuan'] + 
             economics['gas_cost_yuan'] + 
             economics['battery_total_cost_yuan'] +
-            economics['adjustable_loads_cost_yuan']
+            economics['adjustable_loads_cost_yuan'] +
+            economics['ev_charging_cost_yuan'] +
+            economics['interruptible_load_compensation_yuan'] +
+            economics['building_hvac_cost_yuan']
         )
         
         economics['total_cost_yuan'] = (
@@ -407,10 +498,12 @@ class ResultAnalyzer:
         )
         
         economics['total_revenue_yuan'] = economics['grid_sale_revenue_yuan'] + economics['ancillary_services_revenue_yuan']
+        economics['demand_response_revenue_yuan'] = self._calculate_demand_response_revenue()
+        economics['total_revenue_yuan'] += economics['demand_response_revenue_yuan']
         economics['net_cost_yuan'] = economics['total_cost_yuan'] - economics['total_revenue_yuan']
         
         # 平均指标
-        total_demand = self.results_df.get('load_demand_mw', pd.Series(0, index=self.time_index)).sum()
+        total_demand = self._series_energy(self.results_df.get('load_demand_mw', pd.Series(0, index=self.time_index)))
         if total_demand > 0:
             economics['average_cost_yuan_per_mwh'] = economics['net_cost_yuan'] / total_demand
         else:
@@ -419,6 +512,94 @@ class ResultAnalyzer:
         economics['average_electricity_price_yuan_mwh'] = price_data.mean()
         
         return economics
+
+    def _calculate_demand_response_revenue(self) -> float:
+        """估算需求响应收益"""
+        incentive_config = self.config.get('incentive_based_dr', {})
+        if not incentive_config.get('enabled', False):
+            return 0.0
+
+        dlc_config = incentive_config.get('direct_load_control', {})
+        event_hours = incentive_config.get('event_hours', [])
+        event_mask = self.results_df.index.hour.isin(event_hours) if self.results_df is not None else []
+        demand_response_revenue = 0.0
+
+        if dlc_config.get('enabled', False) and self.results_df is not None:
+            incentive_rate = dlc_config.get('incentive_rate_yuan_mwh', 200)
+            for load_name in dlc_config.get('controllable_loads', []):
+                series_key = self._resolve_load_series_key(load_name)
+                if series_key is None:
+                    continue
+                actual_series = self.results_df.get(series_key, pd.Series(0, index=self.time_index))
+                if actual_series.empty:
+                    continue
+
+                nominal_power = self._get_nominal_power_for_load(load_name)
+                curtailed_energy = float(np.maximum(nominal_power - actual_series[event_mask], 0).sum() * self.time_step_hours)
+                demand_response_revenue += curtailed_energy * incentive_rate
+
+        interruptible_cfg = incentive_config.get('interruptible_load', {})
+        if interruptible_cfg.get('enabled', False) and self.results_df is not None:
+            incentive_rate = interruptible_cfg.get('incentive_rate_yuan_mwh', 400)
+            for load_name, load_cfg in self.config.get('interruptible_loads', {}).items():
+                flow_key = f'interruptible_load_{load_name}_mw'
+                actual_series = self.results_df.get(flow_key, pd.Series(0, index=self.time_index))
+                level_capacity = sum(
+                    level.get('capacity_mw', 0.0)
+                    for level in load_cfg.get('interruption_levels', {}).values()
+                )
+                nominal_power = level_capacity if level_capacity > 0 else (
+                    load_cfg.get('rated_power_mw', 0.0) * load_cfg.get('interruptible_ratio', 0.0)
+                )
+                curtailed_energy = float(np.maximum(nominal_power - actual_series[event_mask], 0).sum() * self.time_step_hours)
+                demand_response_revenue += curtailed_energy * incentive_rate
+
+        return demand_response_revenue
+
+    def _resolve_load_series_key(self, load_name: str) -> Optional[str]:
+        """根据负荷名称定位结果列名"""
+        candidates = {
+            'chiller': 'chiller_load_mw',
+            'heat_pump': 'heat_pump_load_mw',
+            'ev_charging_station': 'ev_charging_power_mw',
+        }
+        if load_name in candidates:
+            return candidates[load_name]
+        if load_name.startswith('building_hvac_'):
+            return f'{load_name}_mw'
+        if load_name.startswith('interruptible_load_'):
+            return f'{load_name}_mw'
+        candidate_key = f'{load_name}_mw'
+        return candidate_key if self.results_df is not None and candidate_key in self.results_df.columns else None
+
+    def _get_nominal_power_for_load(self, load_name: str) -> float:
+        """获取负荷额定功率"""
+        adjustable_cfg = self.config.get('adjustable_loads', {})
+        if load_name in adjustable_cfg:
+            return adjustable_cfg[load_name].get('rated_power_mw', 0.0)
+        if load_name == 'ev_charging_station':
+            ev_cfg = self.config.get('ev_charging_station', {})
+            num_fast = ev_cfg.get('num_fast_chargers', 0)
+            num_total = ev_cfg.get('num_chargers', 0)
+            num_slow = max(num_total - num_fast, 0)
+            return (
+                num_slow * ev_cfg.get('charger_power_kw', 7) +
+                num_fast * ev_cfg.get('fast_charger_power_kw', 30)
+            ) / 1000.0
+        if load_name.startswith('building_hvac_'):
+            building_name = load_name.replace('building_hvac_', '', 1)
+            return self.config.get('building_hvac', {}).get(building_name, {}).get('rated_power_mw', 0.0)
+        if load_name.startswith('interruptible_load_'):
+            interruptible_name = load_name.replace('interruptible_load_', '', 1)
+            load_cfg = self.config.get('interruptible_loads', {}).get(interruptible_name, {})
+            level_capacity = sum(
+                level.get('capacity_mw', 0.0)
+                for level in load_cfg.get('interruption_levels', {}).values()
+            )
+            return level_capacity if level_capacity > 0 else (
+                load_cfg.get('rated_power_mw', 0.0) * load_cfg.get('interruptible_ratio', 0.0)
+            )
+        return 0.0
     
     def _calculate_technical_metrics(self) -> Dict[str, Any]:
         """计算技术性能指标"""
@@ -434,7 +615,7 @@ class ResultAnalyzer:
         metrics['load_peak_mw'] = load_demand.max()
         metrics['load_valley_mw'] = load_demand.min()
         metrics['load_average_mw'] = load_demand.mean()
-        metrics['load_total_mwh'] = load_demand.sum()
+        metrics['load_total_mwh'] = self._series_energy(load_demand)
         metrics['load_factor'] = metrics['load_average_mw'] / metrics['load_peak_mw'] if metrics['load_peak_mw'] > 0 else 0
         
         # 可再生能源指标
@@ -442,14 +623,14 @@ class ResultAnalyzer:
         wind_generation = self.results_df.get('wind_generation_mw', pd.Series(0, index=self.time_index))
         total_renewable = pv_generation + wind_generation
         
-        metrics['pv_generation_mwh'] = pv_generation.sum()
-        metrics['wind_generation_mwh'] = wind_generation.sum()
-        metrics['total_renewable_mwh'] = total_renewable.sum()
+        metrics['pv_generation_mwh'] = self._series_energy(pv_generation)
+        metrics['wind_generation_mwh'] = self._series_energy(wind_generation)
+        metrics['total_renewable_mwh'] = self._series_energy(total_renewable)
         
         # 可再生能源渗透率
         total_generation = (
-            total_renewable.sum() + 
-            self.results_df.get('gas_generation_mw', pd.Series(0, index=self.time_index)).sum()
+            self._series_energy(total_renewable) + 
+            self._series_energy(self.results_df.get('gas_generation_mw', pd.Series(0, index=self.time_index)))
         )
         
         if total_generation > 0:
@@ -461,8 +642,8 @@ class ResultAnalyzer:
         battery_charge = abs(self.results_df.get('battery_charge_mw', pd.Series(0, index=self.time_index)))
         battery_discharge = self.results_df.get('battery_discharge_mw', pd.Series(0, index=self.time_index))
         
-        metrics['battery_charge_mwh'] = battery_charge.sum()
-        metrics['battery_discharge_mwh'] = battery_discharge.sum()
+        metrics['battery_charge_mwh'] = self._series_energy(battery_charge)
+        metrics['battery_discharge_mwh'] = self._series_energy(battery_discharge)
         
         if metrics['battery_charge_mwh'] > 0:
             metrics['battery_round_trip_efficiency'] = metrics['battery_discharge_mwh'] / metrics['battery_charge_mwh']
@@ -473,21 +654,43 @@ class ResultAnalyzer:
         grid_purchase = self.results_df.get('grid_purchase_mw', pd.Series(0, index=self.time_index))
         grid_sale = self.results_df.get('grid_sale_mw', pd.Series(0, index=self.time_index))
         
-        metrics['grid_purchase_mwh'] = grid_purchase.sum()
-        metrics['grid_sale_mwh'] = grid_sale.sum()
+        metrics['grid_purchase_mwh'] = self._series_energy(grid_purchase)
+        metrics['grid_sale_mwh'] = self._series_energy(grid_sale)
         metrics['net_grid_purchase_mwh'] = metrics['grid_purchase_mwh'] - metrics['grid_sale_mwh']
         
         # 可调负荷指标
         chiller_load = self.results_df.get('chiller_load_mw', pd.Series(0, index=self.time_index))
         heat_pump_load = self.results_df.get('heat_pump_load_mw', pd.Series(0, index=self.time_index))
         
-        metrics['chiller_consumption_mwh'] = chiller_load.sum()
-        metrics['heat_pump_consumption_mwh'] = heat_pump_load.sum()
+        metrics['chiller_consumption_mwh'] = self._series_energy(chiller_load)
+        metrics['heat_pump_consumption_mwh'] = self._series_energy(heat_pump_load)
         metrics['total_adjustable_loads_mwh'] = metrics['chiller_consumption_mwh'] + metrics['heat_pump_consumption_mwh']
+
+        ev_load = self.results_df.get('ev_charging_power_mw', pd.Series(0, index=self.time_index))
+        metrics['ev_charging_energy_mwh'] = self._series_energy(ev_load)
+        ev_nominal_power = self._get_nominal_power_for_load('ev_charging_station')
+        if ev_nominal_power > 0:
+            metrics['ev_charger_utilization_ratio'] = ev_load.mean() / ev_nominal_power
+        else:
+            metrics['ev_charger_utilization_ratio'] = 0
+
+        interruptible_cols = [col for col in self.results_df.columns if col.startswith('interruptible_load_') and col.endswith('_mw')]
+        metrics['interruptible_load_energy_mwh'] = float(self.results_df[interruptible_cols].sum().sum() * self.time_step_hours) if interruptible_cols else 0.0
+        metrics['interruptible_load_count'] = len(interruptible_cols)
+
+        hvac_cols = [col for col in self.results_df.columns if col.startswith('building_hvac_') and col.endswith('_mw')]
+        metrics['building_hvac_energy_mwh'] = float(self.results_df[hvac_cols].sum().sum() * self.time_step_hours) if hvac_cols else 0.0
+        metrics['building_hvac_count'] = len(hvac_cols)
+        metrics.update(self._estimate_hvac_comfort_metrics(hvac_cols))
         
         # 可调负荷参与率
         if metrics['load_total_mwh'] > 0:
-            metrics['adjustable_load_ratio'] = metrics['total_adjustable_loads_mwh'] / metrics['load_total_mwh']
+            metrics['adjustable_load_ratio'] = (
+                metrics['total_adjustable_loads_mwh'] +
+                metrics['ev_charging_energy_mwh'] +
+                metrics['interruptible_load_energy_mwh'] +
+                metrics['building_hvac_energy_mwh']
+            ) / metrics['load_total_mwh']
         else:
             metrics['adjustable_load_ratio'] = 0
         
@@ -518,7 +721,7 @@ class ResultAnalyzer:
         
         # 自给自足率
         if metrics['load_total_mwh'] > 0:
-            self_supply = metrics['total_renewable_mwh'] + self.results_df.get('gas_generation_mw', pd.Series(0, index=self.time_index)).sum()
+            self_supply = metrics['total_renewable_mwh'] + self._series_energy(self.results_df.get('gas_generation_mw', pd.Series(0, index=self.time_index)))
             metrics['self_sufficiency_ratio'] = min(self_supply / metrics['load_total_mwh'], 1.0)
         else:
             metrics['self_sufficiency_ratio'] = 0
@@ -540,6 +743,53 @@ class ResultAnalyzer:
         else:
             metrics['supply_flexibility_index'] = 0
         
+        return metrics
+
+    def _estimate_hvac_comfort_metrics(self, hvac_cols) -> Dict[str, Any]:
+        """估算HVAC舒适度指标"""
+        metrics = {
+            'building_hvac_comfort_hours_ratio': 1.0,
+            'building_hvac_average_indoor_temp_c': 0.0,
+        }
+        if not hvac_cols:
+            return metrics
+
+        comfort_ratios = []
+        avg_temperatures = []
+
+        for building_name, building_cfg in self.config.get('building_hvac', {}).items():
+            col = f'building_hvac_{building_name}_mw'
+            if col not in self.results_df.columns:
+                continue
+
+            outdoor_pattern = building_cfg.get('outdoor_temp_pattern', [20] * len(self.time_index))
+            outdoor_series = pd.Series(
+                np.resize(np.array(outdoor_pattern, dtype=float), len(self.time_index)),
+                index=self.time_index
+            )
+            indoor_temp = float(building_cfg.get('initial_temperature_c', building_cfg.get('target_temperature_c', 23)))
+            target_temp = float(building_cfg.get('target_temperature_c', 23))
+            min_temp, max_temp = building_cfg.get('temperature_range', [20, 26])
+            thermal_mass = max(float(building_cfg.get('thermal_mass_kwh_per_c', 500)), 1.0)
+            cop = max(float(building_cfg.get('cop', 3.5)), 1.0)
+
+            simulated_temps = []
+            hvac_series = self.results_df[col]
+            for idx in range(len(self.time_index)):
+                heat_gain = (outdoor_series.iloc[idx] - indoor_temp) * 0.12
+                hvac_cooling = (hvac_series.iloc[idx] * cop) / thermal_mass * 10.0
+                target_pull = (target_temp - indoor_temp) * 0.08
+                indoor_temp = indoor_temp + heat_gain - hvac_cooling + target_pull
+                simulated_temps.append(indoor_temp)
+
+            temp_series = pd.Series(simulated_temps, index=self.time_index)
+            comfort_ratio = ((temp_series >= min_temp) & (temp_series <= max_temp)).mean()
+            comfort_ratios.append(float(comfort_ratio))
+            avg_temperatures.append(float(temp_series.mean()))
+
+        if comfort_ratios:
+            metrics['building_hvac_comfort_hours_ratio'] = float(np.mean(comfort_ratios))
+            metrics['building_hvac_average_indoor_temp_c'] = float(np.mean(avg_temperatures))
         return metrics
     
     def generate_summary_report(self) -> str:
@@ -593,8 +843,16 @@ class ResultAnalyzer:
                 report_lines.append(f"热机用电量: {self.technical_metrics['heat_pump_consumption_mwh']:.2f} MWh")
             if 'total_adjustable_loads_mwh' in self.technical_metrics:
                 report_lines.append(f"可调负荷总量: {self.technical_metrics['total_adjustable_loads_mwh']:.2f} MWh")
+            if 'ev_charging_energy_mwh' in self.technical_metrics:
+                report_lines.append(f"EV充电量: {self.technical_metrics['ev_charging_energy_mwh']:.2f} MWh")
+            if 'interruptible_load_energy_mwh' in self.technical_metrics:
+                report_lines.append(f"可中断负荷电量: {self.technical_metrics['interruptible_load_energy_mwh']:.2f} MWh")
+            if 'building_hvac_energy_mwh' in self.technical_metrics:
+                report_lines.append(f"楼宇空调用电量: {self.technical_metrics['building_hvac_energy_mwh']:.2f} MWh")
             if 'adjustable_load_ratio' in self.technical_metrics:
                 report_lines.append(f"可调负荷参与率: {self.technical_metrics['adjustable_load_ratio']:.1%}")
+            if 'building_hvac_comfort_hours_ratio' in self.technical_metrics:
+                report_lines.append(f"楼宇舒适时长占比: {self.technical_metrics['building_hvac_comfort_hours_ratio']:.1%}")
         
         # 辅助服务
         if 'total_ancillary_services_mw' in self.technical_metrics and self.technical_metrics['total_ancillary_services_mw'] > 0:
@@ -617,6 +875,8 @@ class ResultAnalyzer:
         report_lines.append(f"总运行成本: {self.economics['total_cost_yuan']:,.2f} 元")
         if 'ancillary_services_revenue_yuan' in self.economics and self.economics['ancillary_services_revenue_yuan'] > 0:
             report_lines.append(f"辅助服务收入: {self.economics['ancillary_services_revenue_yuan']:,.2f} 元")
+        if 'demand_response_revenue_yuan' in self.economics and self.economics['demand_response_revenue_yuan'] > 0:
+            report_lines.append(f"需求响应收入: {self.economics['demand_response_revenue_yuan']:,.2f} 元")
         report_lines.append(f"总售电收入: {self.economics['total_revenue_yuan']:,.2f} 元")
         report_lines.append(f"净运行成本: {self.economics['net_cost_yuan']:,.2f} 元")
         report_lines.append(f"平均电价: {self.economics['average_electricity_price_yuan_mwh']:.2f} 元/MWh")

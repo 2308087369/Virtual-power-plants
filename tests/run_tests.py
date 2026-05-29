@@ -14,6 +14,7 @@ from datetime import datetime
 current_dir = os.path.dirname(os.path.abspath(__file__))
 project_root = os.path.dirname(current_dir)
 src_dir = os.path.join(project_root, 'src')
+sys.path.insert(0, project_root)
 sys.path.insert(0, src_dir)
 
 
@@ -136,6 +137,20 @@ def run_complete_flow_tests():
         return False
 
 
+def run_roadmap_feature_tests():
+    """运行路线图增强能力测试"""
+    print("\n[TEST] 路线图增强能力测试")
+    print("-" * 50)
+
+    try:
+        from tests.test_roadmap_features import run_tests
+        success = run_tests()
+        return success
+    except Exception as e:
+        print(f"[FAIL] 路线图增强能力测试失败: {e}")
+        return False
+
+
 def run_all_tests():
     """运行所有测试"""
     print_header()
@@ -150,6 +165,7 @@ def run_all_tests():
         ("优化目标", run_optimization_objectives_tests),
         ("可调负荷", run_adjustable_loads_tests),
         ("辅助服务", run_ancillary_services_tests),
+        ("路线图增强", run_roadmap_feature_tests),
         ("完整流程", run_complete_flow_tests),
     ]
     
@@ -201,7 +217,7 @@ def main():
     parser = argparse.ArgumentParser(description="虚拟电厂系统测试运行器")
     parser.add_argument("--test", choices=[
         "basic", "cbc", "scheduling", "objectives", 
-        "loads", "ancillary", "flow", "all"
+        "loads", "ancillary", "roadmap", "flow", "all"
     ], default="all", help="选择要运行的测试类型")
     
     args = parser.parse_args()
@@ -218,6 +234,8 @@ def main():
         run_adjustable_loads_tests()
     elif args.test == "ancillary":
         run_ancillary_services_tests()
+    elif args.test == "roadmap":
+        run_roadmap_feature_tests()
     elif args.test == "flow":
         run_complete_flow_tests()
     else:  # all
