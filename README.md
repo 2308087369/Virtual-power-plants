@@ -184,7 +184,14 @@ Real-time rolling dispatch:
 
 ## 📄 License
 
-MIT License - See [LICENSE](LICENSE) file for details
+MIT License - See [LICENSE](LICENSE) file for details.
+
+## 📚 Citation
+
+If you use this repository in a paper, report, or thesis, please cite it as:
+
+`[1] Bo.Chen. (2026). Virtual Power Plant Optimization System. Retrieved from https://github.com/2308087369/Virtual-power-plants`
+
 ### Examples
 - Microgrid optimization demo with full visualization:
   - Script: `examples/optimization_microgrid_complete.py`

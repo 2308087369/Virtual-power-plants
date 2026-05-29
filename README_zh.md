@@ -185,7 +185,14 @@ vpp_opt_test_qqder/
 
 ## 许可证
 
-MIT License - 详见 [LICENSE](LICENSE) 文件
+MIT License - 详见 [LICENSE](LICENSE) 文件。
+
+## 引用
+
+如果有论文、报告或学位论文需要引用本仓库，可参考以下格式：
+
+`[1] Bo.Chen. (2026). Virtual Power Plant Optimization System. Retrieved from https://github.com/2308087369/Virtual-power-plants`
+
 ### 示例
 - 微电网优化示例（含完整可视化与报告）：
   - 脚本：`examples/optimization_microgrid_complete.py`
